@@ -1,0 +1,811 @@
+\documentclass[10pt]{article}
+\title{Samenvatting Informatie-overdracht en -verwerking [H01D2A]}
+\author{Wouter Schaekers\\*---\\*2Bach Informatica - 2/3Bach Wiskunde - 2/3Bach Fysica - 2Bach Ingenieurswetenschappen}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[top=25mm, bottom=25mm, left=25mm, right=25mm]{geometry}
+\begin{document}
+\maketitle
+\setcounter{section}{-1}
+\setcounter{page}{0}
+\renewcommand{\contentsname}{Inhoudstafel}
+\setcounter{tocdepth}{3}
+\tableofcontents
+\clearpage
+\section{Inleiding}
+Deze samenvatting is bedoeld voor de studenten die het vak al eens hebben doorgenomen.\\*
+Heel wat van de (irrelevante) tekst is weggelaten en vaak zijn (vooral de eerste) hoofdstukken gereduceerd tot een opsomming van formules met hier en daar wat uitleg. De teksten die in de cursus staan en ik in deze samenvatting heb gebruikt zijn grotendeels herwerkt tot een compactere versie die al het nodige bevat om de leerstof te kunnen begrijpen. Ik raad ook aan het formularium te raadplegen tijdens het studeren. Het overgrote deel van de formules staat daarin.\\*
+Dit is enkel een samenvatting van de cursustekst, niet van de bijbehorende slides (dat wil niet zeggen dat er niet naar de slides kan verwezen worden).\\*
+Van hoofstuk 11 en 12 zijn enkel slides beschikbaar. Voor deze hoofdstukken zijn daarom de slides samengevat. Onderdeel 2.10 (Lempel-Ziv) en 7.6 (Radiopropagatiemechanismen) zijn niet in de samenvatting opgenomen omdat deze niet gekend moesten zijn.\\*
+Versie 2010-2011 van het boek is gebruikt. Paginanummers en afbeeldingen kunnen in andere versies verschillen.\\*\\*
+Deze samenvatting is hoogstwaarschijnlijk niet foutloos. Eventuele aanpassingen kunnen gemaakt worden op https://github.com/WouterSchaekers/IOV-Samenvatting.\\*
+De auteur is niet bereid samenvattingen te signeren.\\*
+Het sturen van spam is verboden. Het stalken van de auteur is, na toestemming, slechts in uitzonderlijke omstandigheden toegestaan.\\*
+De auteur is niet verantwoordelijk voor enige gevolgen van het gebruik van deze bundel.\\*
+Het is verboden de afgedrukte versie van de samenvatting te verbranden of op te eten.\\*\\*
+Deze samenvatting is enkel getest op een Linuxsysteem. Het gebruik van deze samenvatting -vooral het onderdeel logica- kan op Windows leiden tot onstabiliteit van het systeem.\\*
+Geen langdurig gebruik zonder wiskundig advies.\\*\\*
+Alle lijnstukken voorbehouden. Niet op de openbare weg gooien.\\\\\\
+This resume is released under the beerware license. Donations on the following bitcoin address are really appreciated. Thanks.\\\\\\\\\\\\\\\\
+\begin{center}
+\textit{"Alles moet zo eenvoudig mogelijk gemaakt worden, maar niet eenvoudiger dan dat."}\\*-\\*Albert Einstein
+\end{center}
+\begin{center}
+\includegraphics[scale=0.5]{BitcoinAddress.png}\\*
+\includegraphics[scale=0.02]{Bitcoin.png} \textbf{13q1jzScgpD9hWowyH6tctjkSzP8J6GTsV}
+\end{center}
+\clearpage
+\section{Hoofdstuk 1 - Discrete informatiebronnen}
+bit = hoeveelheid informatie\\*
+bit* = \# symbolen\\*\\*
+Hoeveelheid informatie in een boodschap:\\*
+H = l*$\log n$\\*
+{\scriptsize l = lengte, n = $\#$ mogelijke symbolen}\\*\\*
+Hoeveelheid informatie van symbool a$_i$ met waarschijnlijkheid p$_i$:\\*
+H(a$_i$) = -$\log p_i$ bit/symbool a$_i$\\*
+Gemiddelde hoeveelheid informatie per symbool uit een alfabet A met n symbolen:\\*
+H(A) = -$\sum_{i=1}^n p_i*\log p_i$ bit/symbool\\*
+Gemiddelde informatie van een boodschap M met l symbolen:\\*
+H(M) = -l*$\sum_{i=1}^n p_i*\log p_i$ bit/boodschap\\*
+Maximale gemiddelde hoeveelheid informatie per symbool (zonder geheugen):\\*
+maxH(A) = $\log n$ bit/symbool\\*\\*
+Informatiedebiet H$_t$(A) = $\frac{1}{t}$*H(A) bit/s\\*
+{\scriptsize Geleverde informatie per tijdseenheid.}\\*
+Transmissiedebiet r$_s$(A) = $\frac{H_t(A)}{H(A)}$ symbolen/s (= baud)\\*
+{\scriptsize Geleverde aantal symbolen per tijdseenheid.}\\*\\*
+Waarschijnlijkheidsredundantie (zonder geheugen) R$_w$(A) = 1 - $\frac{H(A)}{maxH(A)}$\\*
+{\scriptsize Drukt uit in welke mate de maximale waarde van de gemiddelde hoeveelheid informatie per symbool benaderd wordt. Deze waarde ligt tussen 0 (alle symbolen hebben dezelfde waarschijnlijkheid) en 1 (er is slechts \'e\'en symbool dat kan optreden).}\\*\\*
+Rij van gegenereerde symbolen = Markov keten.\\*
+Bijvoorbeeld: S$_i$ = $\{s_{n-k}, s_{n-k+1}, ..., s_{n-1}\}$\\*
+Deze Markov keten kan overgaan naar een nieuwe toestand door toevoeging van een symbool s$_n$:\\*
+S$_i$ $\rightarrow$ S$_j$ = $\{s_{n-k+1}, s_{n-k+2}, ..., s_n\}$\\*
+De kans dat dit gebeurt noteren we als P(j$|$i).\\*\\*
+De gezamelijke hoeveelheid informatie voor twee opeenvolgende symbolen s$_1$ en s$_2$ (met geheugen):\\*
+H(s$_1$, s$_2$) = H(s$_1$) + H($s_2|s_1$)\\*
+Deze informatie is altijd kleiner (of gelijk aan) de informatie van de twee symbolen afzonderlijk: H(s$_1$, s$_2$) $\le$ H(s$_1$) + H(s$_2$)\\*
+{\scriptsize Merk op dat hier de gelijkheid geldt indien de twee symbolen onderling onafhankelijk zijn: H($s_2|s_1$) = H($s_2$).}\\*\\*
+De gemiddelde hoeveelheid informatie per symbool van een boodschap bestaande uit n opeenvolgende symbolen:\\*
+H$_g$(s$_1$, s$_2$, \dots, s$_n$) = $\frac{H(s_1) + \sum_{i = 1}^{n-1} H(s_{i+1}|s_i)}{n}$ bit/symbool\\*\\*
+Afhankelijkheidsredunantie R$_a$(A) = 1 - $\frac{H_g(A)}{H(A)}$\\*
+Totale redundantie R$_t$(A) = 1 - $\frac{H_g(A)}{maxH(A)}$
+\section{Hoofdstuk 2 - Broncodering}
+\subsection{Inleiding en eigenschappen}
+Conclusie van Hoofdstuk 1: het is weinig effici\"ent symbolen over te brengen die afkomstig zijn van een bron met een grote redundantie. We willen de bron coderen. Dit doen we door symbolen uit het alfabet A om te zetten naar codewoorden opgebouwd uit broncode-symbolen uit een broncode-alfabet B met r symbolen.\\*\\*
+Eigenschappen van broncodes:
+\begin{itemize}
+\item niet-singulier: alle codewoorden zijn verschillend {\scriptsize (codes 2 - 6, blz 2.1)}
+\item ondubbelzinning decodeerbaar: het resultaat blijft niet-singulier (uniek) bij opeenvolging van codewoorden {\scriptsize (codes 2, 4 en 5, blz 2.1)}
+\item direct decodeerbaar: ondubbelzinnig decodeerbaar + zonder te wachten op het volgende codewoord {\scriptsize (codes 2 en 5, blz 2.1)}
+\end{itemize}
+Indien een code direct decodeerbaar is met codewoorden met lengten l$_i$ en r symbolen, dan voldoet deze code aan de ongelijkheid van Kraft:\\*
+$\sum_{i = 1}^{n} r^{-l_i} \leq 1$.\\*
+Merk op dat deze regel slechts in \'e\'en richting geldt. Het is niet omdat een code voldoedt aan de ongelijkheid van Kraft, dat deze dan onmiddelijk decodeerbaar is.\\*\\*
+Gemiddelde codewoordelengte L van een brondcodering met lengtes l$_i$ en met kans van optreden p$_i$:\\*
+L = $\sum_{i = 1}^{n} p_i*l_i$ symbolen/codewoord\\*
+{\scriptsize $\not=$ Gemiddelde lengte van de codewoorden = rekenkundig gemiddelde.}\\*
+Voor de verzameling codewoorden die voldoen aan de ongelijkheid van Kraft geldt:\\*
+$\frac{H(A)}{\log r} \leq L$\\*
+Hieruit volgt dat de gemiddelde codewoordlengte minimaal is als L = $\frac{H(A)}{\log r}$. Dit treedt op als:\\*
+l$_i$ = -$\log_i p_i$ symbolen\\*
+Dit kan enkel indien -$\log_i p_i$ een geheel getal is.\\*\\*
+De effici\"entie van een broncodering $\xi$ = $\frac{H(A)}{L*\log r} \frac{bit*codewoord}{bit^**symbool uit A}$\\*\\*
+De gemiddelde codewoordlengte L' van de broncodering ligt altijd tussen de grenzen:\\*
+H(A) $\leq$ L' $<$ H(A) + 1
+\subsection{Huffman-codering}
+De Huffman codering is direct decodeerbaar waarbij de gemiddelde codewoordlengte L van de broncodering het kortst is, gegeven het bronalfabet. Werkwijze:\\*
+\begin{itemize}
+\item Rankschik de symbolen van A volgens afnemende waarschijnlijkheid.
+\item Voeg de 2 minst waarschijnlijke symbolen samen. Deze vormen een tak van de Huffman-boom die we gaan vormen. We hebben nog n-1 aantal symbolen over, alle andere symbolen + de tak zelf.
+\item Doe dit totdat er slechts twee elementen overblijven.
+\end{itemize}
+Aan deze twee elementen kennen we de symbolen 0 en 1 toe. Ga nu heel de boom af op deze wijze dat je telkens een 0 en 1 toekent.\\*
+De Huffman-codering met alfabetuitbreiding werkt op dezelfde manier, maar hier worden alle combinaties (van symbolen uit A) beschouwd. Zo zal de Huffman-boom bestaande uit alle mogelijke groepen van 2 symbolen uit A bestaat uit n$^2$ elementen. Let op dat je bij de berekening van de gemiddelde codewoordlengte niet vergeet te delen door het aantal symbolen per groep.\\*\\*
+Compressieverhouding: verhouding van het gemiddeld $\#$ bit$^*$/symbool zonder broncodering op het gemiddeld $\#$ bit$^*$/symbool met broncodering.
+\subsection{Looplengte-codering voor telefax-transmissie}
+We kunnen ook broncodering toepassen op een bron met geheugen. Een rij van opeenvolgende witte beeldpunten, gevolgd door een zwart beeldpunt kunnen we als volgt beschouwen:\\*
+P$_k$(0) = P(0$|0)^{k-1}*P(0|$0)\\*
+De gemiddelde lengte va neen rij witte beeldpunten is dan ook:\\*
+$\overline{k}$(0) = $\sum_{k=1}^{\infty} k*P(0|0)^{k-1}*P(1|0)$ = $\frac{1}{P(1|0)}$\\*
+{\scriptsize Uiteraard zijn de formules voor zwarte opeenvolgende punten conform.}\\*
+De looplengtes worden ook hier bepaald door een Huffman-code.
+\section{Hoofdstuk 3 - Continue Informatiebronnen}
+\subsection{Inleiding}
+De hoeveelheid informatie geleverd door een continue informatiebron:\\*
+H(X) = -$\int_{-\infty}^{+\infty} p(x)*\log p(x)dx$ bit/bemonstering\\*\\*
+Het vermogen van een continue informatiebron:\\*
+P$_X$ = $\int_{-\infty}^{+\infty} x^2*p(x)dx$ (in $V^2$)\\*
+{\scriptsize P$_X$ = P*R uitgedrukt in V$^2$}\\*\\*
+Voor een continue informatiebron X met een {\bf amplitude begrensd} uitgangssignaal met bereik (-A, +A) is de hoeveelheid informatie maximaal als:\\*
+p(x) = 1/(2A) (uniform verdeeld over het interval)\\*
+De bijbehorende maximale hoeveelheid informatie:\\*
+maxH(X) = $\log 2A$\\*
+De maateenheid moet met de quantisatiestap overeenkomen opdat de gemiddelde hoeveelheid informatie per bemonstering in absoluut opzicht bruikbaar zou zijn! Indien dit niet het geval is, moeten we nog een quantisatie uitvoeren:\\*
+H(x$^\Delta$) = H(x)-$\log_2 \Delta$\\*
+Voor een continue informatiebron X met een {\bf vermogen begrensd} uitgangssignaal met P$_X$ = constant vermogen $\sigma$ is de hoeveelheid informatie maximaal als:\\*
+p(x) = $\frac{1}{\sigma\sqrt{2\pi}}*e^{-\frac{x^2}{2\sigma^2}}$\\*
+{\scriptsize Dit is een Gaussische verdeling.}\\*
+De bijbehorende maximale hoeveelheid informatie:\\*
+maxH(X) = $\log(\sigma\sqrt{2\pi e})$
+\subsection{Zonder geheugen}
+De waarschijnlijkheidsredundantie van de met amplitude en vermogen begrensd uitgangssignaal wordt op dezelfde manier berekend als in hoofdstuk 1.\\*\\*
+Het informatievermogen P$_H$ van een continue informatiebron X met het stochastisch uitgangssignaal x, is het vermogen van een Gaussisch signaal dat een even grote hoeveelheid informatie levert als het stochastisch signaal x (met een vermogen gelijk aan P$_X$).\\*
+De hoeveelheid informatie geleverd door de informatiebron stellen we gelijk aan de maximale hoeveelheid geleverd door een Gaussische bron met vermogen $\sigma^2$ = P$_H$:\\*
+H(X) = $\log{\sqrt{2\pi e P_H}}$\\*
+We leiden het informatievermogen af:\\*
+P$_H$ = $\frac{1}{2\pi e}*2^{2H(X)}$
+\subsection{Met geheugen}
+Als het signaal x(t) voldoet aan de Dirichlet-voorwaarden (die iedereen uiteraard van buiten kent, wie ze niet meer kent: zie blz 3.5 voor de voorwaarden), dan bestaat de Fouriergetransformeerde:\\*
+X(f) = $\int_{-\infty}^{+\infty}x(t)*e^{-j2\pi ft}dt$\\*
+Of anderom: x(t) = $\int_{-\infty}^{+\infty}X(f)*e^{j2\pi ft}df$\\*
+{\scriptsize De absolute waarde $|X(f)|$ en de fase van X(f) zijn respectievelijk de amplitude en de fase van de frequentiecomponenten in x(t).}\\*\\*
+De absolute bandbreedte B van een signaal x(t) is het gedeelte (f$_2$ - f$_1$) van de positieve frequentie-as waarbij het frequentiespectrum X(f) nul is buiten het interval f$_1$ $<$ f $<$ f$_2$.\\*
+De nul-tot-nul bandbreedte B$_0$ van een signaal x(t) is het gedeelte (f$_2$-f$_1$) van de positieve frequentie-as als f$_2$ en f$_1$ respectievelijk het eerste nulpunt van het frequentiespectrum X(f) na en voor f$_0$ zijn, met f$_0$ de frequentie waarbij $|X(f)|$ maximaal is.\\*\\*
+De bandbreedte tot het eerste nulpunt van een pulssignaal is omgekeerd evenredig met de tijdsduur (=pulsduur). De bandbreedte tot het eerste nulpunt is:\\*
+B$_0$ = k$_0$/$\Delta t$ {\scriptsize t = pulsduur in het tijdsdomein, k$_0$ = een evenredigheidsfactor}\\*
+{\scriptsize Bereken k$_0$ door de verhouding van de totale pulsduur in het tijdsdomein op de totale pulsduur van de rechthoekige puls (= 2a) te vermenigvuldigen met de verhouding van de bandbreedte tot het eerste nulpunt op de bandbreedte tot het eerste nulpunt van de rechthoekige puls (= 1/2a).}\\*\\*
+Merk op dat hoe zachter het verloop van de puls in het tijdsdomein, hoe sterker het frequentiespectrum geconcentreerd is in de hoofdlob rond de centrale as en hoe sneller de amplitude van de zijlobben afneemt met de toenemende frequentie. Dit gaat wel ten koste van een toenemende bandbreedte tot het eerste nulpunt. Zie voorbeelden 3.3 en 3.4 op blz 3.8 en 3.9.
+\section{Hoofdstuk 4 - Discretisatie van continue informatiebronnen}
+\subsection{Bemonsteringstheorema van Nyquist}
+Om een continu signaal x(t) te bemonsteren, gaan we op regelmatige tijdstippen (met constant tijdsinterval T$_s$) de amplitude van het signaal bepalen. Het is de bedoeling dat deze continue signalen vervangen worden door signaalamplitudes x$_s$(t). We stellen f$_m$ voor als de hoogste frequentie die het frequentiespectrum X(f) bevat.\\*
+De bemonstering is enkel succesvol indien de frequenties van bemonsteren groter zijn dan twee maal f$_m$.\\*
+f$_s$ $\geq$ 2*f$_m$\\*
+Dit wil dus zeggen dat: T$_s$ $\leq$ $\frac{1}{2f_m}$\\*
+In de praktijk wordt de bemonsteringsfrequentie groter gekozen:\\*
+f$_s$ $\geq$ 2.2*f$_m$\\*\\*
+Een in absolute bandbreedte beperkt signaal x(t), met frequentiespectrum met bandbreedte B, kan perfect gereconstrueerd worden uitgaande van de bemonsteringen op tijdstippen met een constant tijdsinterval T$_s$ als\\*
+T$_s$ $\leq$ $\frac{1}{2B}$\\*
+Het uitgangssignaal x(t) kan perfect gereconstrueerd worden door middel van 2B bemonsteringen/s. Het maximale informatiedebiet van de continue bron X per tijdseenheid is\\*
+H$_t$(X) = 2B*H(X)\\*
+Is het aantal bemonsteringen kleiner dan 2B, dan is het logisch dat\\*
+H$_t$(X) = f$_s$*H(X)\\*
+Na quantisatie (zodat het informatiedebiet ook absoluut bruikbaar is) zijn de formules respectievelijk:\\*
+H$_t$(X$^\Delta$) = 2B*H(X$^\Delta$) en H$_t$(X$^\Delta$) = f$_s$*H(X$^\Delta$)
+\subsection{Kwantisatie}
+De signaalamplitudes die gegenereerd worden door de bemonstering kunnen oneindig veel waarden aannemen. Het is daarom noodzakelijk om dit te kwantiseren door elke gemeten waarde te benaderen door de dichtsbijgelegen mogelijke waarde uit een gekozen eindige verzameling. Hiervoor moeten we dus een verzameling opstellen. Het eenvoudigste is om een uniforme, scalaire kwantisatie te nemen, verdeeld in K gelijke deelintervallen van grootte a.\\*
+Veronderstel dat het signaal fluctueert tussen -V en +V. Het interval 2V verdelen we in K deelintervallen met grootte a = 2V/K. De gekwantiseerde amplitudes zijn $\pm$a/2, $\pm$3a/2, $\dots$, $\pm$(K-1)(a/2). Zie figuur 4.3 op blz 4.6.\\*
+Het verschil tussen de monsterwaarde en zijn gekwantiseerd equivalent stellen we voor door $\xi$. Deze ligt tussen de grenzen $-\frac{a}{2}$ $\leq$ $\xi$ $\leq$ $\frac{a}{2}$\\*
+Het is makkelijk in te zien dat de kansdichtheid tussen deze grenzen uniform verdeeld is. De kwadratisch gemiddelde waarde van $\xi$ is\\*
+E($\xi^2$) = $\int_{-\frac{a}{2}}^\frac{a}{2}\xi^2p(\xi)d\xi$ = $\frac{a^2}{12}$\\*\\*
+De pieksignaal-tot-kwantisatieruis-verhouding is de verhouding van de piekwaarde (= V = aK/2) op de wortel uit het kwadratisch gemiddelde:\\*
+$\left(\frac{S}{N}\right)_s$ = $\frac{V}{a/\sqrt{12}}$ = $\sqrt{3}K$\\*
+De bijhorende vermogenverhouding is:\\*
+$\left(\frac{S}{N}\right)_v$ = $\left(\left(\frac{S}{N}\right)_s\right)^2$ = $3K^2$\\*
+Uitgedrukt in decibel (= $10\log_{10}{vermogenverhouding}$):\\*
+$\left(\frac{S}{N}\right)_v$ = $10\log_{10}{(3K^2)}$ dB\\*\\*
+Het gemiddeld vermogen van het gekwantiseerd signaal is de  kwadratisch gemiddelde waarde van de gekwantiseerde amplitudes $\pm$a/2, $\pm$3a/2, $\dots$, $\pm$(K-1)(a/2) waarbij elke amplitude even waarschijnlijk is. Deze waarde is:\\*
+$\sum_{i=1}^{K/2}{(a(i-1/2))^2}\frac{1}{K/2}$ = $\frac{a^2}{12}(K^2-1)$\\*
+{\scriptsize  We gebruiken hier de volgende uitdrukking: $\sum_{k=1}^n{(2k-1)^2}$ = $\frac{1}{3}n(4n^2-1)$}\\*\\*
+De gemiddelde signaal-tot-kwantisatieruis-vermogenverhouding is de verhouding van de gemiddelde vermogenwaarde op de kwadratisch gemiddelde waarde\\*
+$\left(\frac{S}{N}\right)_0$ = $\frac{\frac{1}{12}(K^2-1)a^2}{\frac{a^2}{12}}$ = (K$^2$ - 1)\\*\\*
+{\scriptsize Bekijk als afsluiter voorbeelden 4.3 en 4.4 op blz 4.7 en 4.8.}
+\section{Hoofdstuk 5 - Discrete transmissiekanalen}
+\subsection{Inleiding}
+In dit hoofdstuk gaan we ons afvragen wat de kansen zijn op fouten. En wat de maximale hoeveelheid informatie is per symbool die foutloos kan overgebracht worden. De codesymbolen die gebruikt worden aan de input worden voorgesteld door:\\*
+X = \{x$_1$, x$_2$, \dots, x$_m$\}\\*
+Analoog geldt voor het uitgangssignaal:\\*
+Y = \{y$_1$, y$_2$, \dots, y$_n$\}\\*
+We veronderstellen het kanaal bovendien geheugenvrij. De volgende waarschijnlijkheid\\*
+q($y_j|x_i$) = q$_{ji}$ is de kans dat symbool y$_j$ ontvangen wordt als symbool x$_i$ verstuurd werd. Hierbij kunnen we de kanaalmatrix Q opstellen:\\*
+\begin{center}
+Q = $\left[\begin{matrix} 
+q_{11} & q_{12} & \dots & q_{1m} \\
+q_{21} & q_{22} & \dots & q_{2m} \\
+\dots & \dots & \dots & \dots \\
+q_{n1} & q_{n2} & \dots & q_{nm}
+\end{matrix}\right]$
+\end{center}
+Elk ingangssymbool heeft een uitgangssymbool tot gevolg. Dit wil zeggen dat de som van elke kolom waarschijnlijkheid 1 heeft:\\*
+$\sum_{j=1}^n q_{ji} = 1$\\*
+De waarschijnlijkheid dat een symbool y$_j$ optreedt is\\*
+q(y$_j$) = $\sum_{i=1}^m p(x_i)q_{ji}$\\*
+De kans dat het symbool x$_i$ werd uitgezonden als y-$j$ wordt ontvangen is\\*
+p$_{ij}$ = $\frac{p(x_i)q_{ji}}{q(y_j)}$\\*\\*
+De onzekerheid over x als y ontvangen is noemen we de equivocatie of twijfel:\\*
+H(X$|$Y) = -$\sum_{i=1}^m\sum_{j=1}^n q(y_i)p_{ij}\log{p_{ij}}$ {\scriptsize $q(y_i)p_{ij} = p(x_i,y_j)$}\\*
+De onzekerheid over y als x bekend is noemen we de irrelevantie:\\*
+H(Y$|$X) = -$\sum_{i=1}^m\sum_{j=1}^n p(x_i)q_{ji}\log{q_{ji}}$ {\scriptsize $p(x_i)q_{ji} = q(y_j,x_i)$}\\*
+De gemiddelde hoeveelheid overgebrachte informatie defini\"eren we als de gemiddelde hoeveelheid informatie per symbool gegenereerd door de bron min de twijfel:\\*
+R = H(X) - H(X$|$Y) bit/symbool\\*
+Ofwel, de gemiddelde hoeveelheid informatie per symbool bij ontvangst min de irrelevante informatie:\\*
+R = H(Y) - H(Y$|$X) bit/symbool\\*
+{\scriptsize Zie voorbeeld 5.1 op blz 5.4.}
+\subsection{Capaciteit en symboolfoutkans}
+Uit voorbeeld 5.1 kunnen we besluiten dat de hoeveelheid overgebrachte informatie afhangt van de eigenschappen van de bron (de kans dat een bepaald symbool wordt overgebracht) en de eigenschappen van het kanaal (de kans op fouten).\\*
+De capaciteit van een {\bf discreet} kanaal is de maximale waarde van de gemiddelde hoeveelheid informatie per symbool die per symbool overgebracht {\bf kan} worden:\\*
+C = max$_{p(x)}$ R\\*
+Uit voorbeeld 5.2 blijkt dat de capaciteit van het kanaal enkel afhangt van de eigenschappen van het kanaal (de kans of fouten).\\*\\*
+{\scriptsize Opmerking: De capaciteit van een {\bf discreet} kanaal zegt enkel iets over de hoeveelheid informatie die per symbool kan overgebracht worden, niet de symbolen per tijdseenheid. Dat laatste wordt bepaald door de capaciteit van het {\bf continue} kanaal.}\\*
+De kans op een fout bij ontvangst van een symbool y$_j$:\\*
+p(e$|y_j)$ = $\sum_{i=1, i\neq j}^n p(x_i|y_j)$ = 1 - p($x_j|y_j$)\\*
+De gemiddelde foutkans wordt dan:\\*
+P$_e$ = $\sum_{j = 1}^n q(y_j)p(e|y_j)$ = $\sum_{j=1}^n q(y_j)\left[1-p(x_j|y_j)\right]$\\*
+Of vanuit de zender: P$_e$ = $\sum_{i=1}^np(x_i)\left[1-q(y_i|x_i)\right]$
+\subsection{Kanaalcodering}
+Kanaalcoderingstheorema: Het is mogelijk langs een discreet kanaal zonder geheugen met capaciteit C een gemiddelde hoeveelheid informatie per symbool H(X) over te brengen met een willekeurig kleine foutkans P$_e$ zolang H(x) $\leq$ C. Is H(X) $\geq$ C dan is er een overblijvende onzekerheid H(X$|$Y) $\geq$ H(X) - C.
+We geven geen verdere bewijsvoering.\\*\\*
+We veronderstellen dat de informatiebron symbolen u$_i$ genereert (binair). We verdelen de symbolen gegenereerd door de bron in goepen van k symbolen:\\*
+u$_1$, u$_2$, \dots, u$_k$\\*
+Elke dergelijke groep biedt M = 2$^k$ mogelijke boodschappen, die met dezelfde waarschijnlijkheid P(u) = 1/2$^k$ voorkomen.\\*
+We voegen aan elke groep n-k controlesymbolen toe. Hieruit halen we de coderingseffici\"entie:\\*
+$\xi = \frac{k}{n}$\\*
+{\scriptsize Zie voorbeeld 5.3 op blz 5.9.}
+\subsection{Systematische lineaire blokcodes}
+Een blokcode is systematisch als de ka symbolen gegenereerd door de bron, voorkomen als de eerste k symbolen in het codewoord na de kanaalcodering.\\*
+Een blokcode is lineair als elk van de 2$^k$ codewoorde kan geschreven worden als een lineaire combinatie van k lineair onafhankelijke codevectoren.\\*
+We zullen verder enkel systematische lineaire blokcodes behandelen.\\*
+In een systematische, lineaire blokcode zijn\\*
+c$_i$ = u$_i$ voor i = 1,2,\dots,k\\*
+De overige n-k symbolen kunnen we (samen met de eerste k symbolen) voorstellen als
+\begin{center}
+$\left[c_1, c_2, \dots, c_n\right] = \left[u_1, u_2, \dots, u_k\right]\left[\begin{matrix} 
+1 & 0 & \dots & 0 & p_{11} & p_{12} & \dots & p_{1, n-k}\\
+0 & 1 & \dots & 0 & p_{21} & p_{22} & \dots & p_{2, n-k}\\
+\dots & \dots & \dots & \dots & \dots & \dots & \dots & \dots\\
+0 & 0 & \dots & 1 & p_{k1} & p_{k2} & \dots & p_{k, n-k}
+\end{matrix}\right]$
+\end{center}
+C = UG\\*
+Met G de rechtse 'generatormatrix' G = $\left[I_k P\right]_{k*n}$\\*
+{\scriptsize Zie voorbeeld 5.4 op blz 5.11}\\*\\*
+Bij elke (n,k)-blokcode hoort ook een pariteitscontrolematrix H:\\*
+H = $\left[P^T I_{n-k}\right]_{(n-k)*n}$\\*
+Elk codewoord C, gegenereerd door de gereratormatrix G voldoet aan de vergelijking\\*
+C*H$^T$ = 0\\*
+Ruis veroorzaakt fouten waardoor we de vector Y = C + F ontvangen, met F als foutvector. De decoder zal telkens de foutsyndroomvector van Y proberen te bepalen. Deze wordt gegeven door\\*
+S = Y*H$^T$ = (C+F)*H$^T$ = F*H$^T$\\*
+Een geldige codevector zorgt voor: S = 0.\\*
+{\scriptsize Zie voorbeeld 5.5 op blz 5.13}\\*\\*
+Het gewicht w van een codewoord is gelijk aan het aantal \'enen.\\*
+De Hamming-afstand d tussen twee codewoorden is gelijk aan het aantal verschillende symbolen.\\*
+De minimum-afstand d$_{min}$ van een blokcode is de minimum waarde van alle Hamming-afstanden tussen elk mogelijk paar codewoorden.\\*
+Het foutdetectievermogen e van een blokcode is\\*
+e = d$_{min}$ - 1\\*
+Het foutcorrectievermogen van t van een blokcode is\\*
+t = $\lfloor{\frac{d_{min}-1}{2}}\rfloor$ {\scriptsize ($\lfloor x\rfloor$ = afronden naar beneden)}\\*
+De minimum-afstand van een lineaire blokcode is gelijk aan de minimum waarde van de gewichten van de codewoorden die verschillen van (0 0 \dots 0).\\*
+{\scriptsize Let op dat t en e niet gelijktijdig aangewend kan worden! Ze zijn wel uitwisselbaar. Bijvoorbeeld: Als d$_{min}$ = 7, t = 3 en e = 6, dan kunnen er 3 gedetecteerd worden en 3 gecorrigeerd, of 5 gedetecteerd en 1 gecorrigeerd, \dots.}
+\section{Hoofdstuk 6 - Continue transmissiekanalen}
+\subsection{Theorema van Shannon}
+De gemiddelde hoeveelheid informatie is (zie vorige hoofdstuk)\\*
+R = H(X) - H(X$|$Y) = H(Y) - H(Y$|$X)\\*
+De capaciteit per bemonstering C$_b$ van een {\bf continu} kanaal is de maximale waarde van de gemiddelde hoeveelheid overgebrachte informatie per bemonstering voor alle mogelijke kansverdelingen p(x) van de bron:\\*
+C$_b$ = max$_{p(x)}$ R\\*
+{\scriptsize Zie figuur 6.2 op blz 6.2 (lol).}\\*\\*
+De witte ruis (= de vermogendichtheid in functie van de frequentie is constant) heeft een gemiddelde waarde van 0, een gemiddled vermogen van P$_n$ = $\sigma_n^2$ en een Gaussische kansverdeling voor de amplitude. We hebben een Gaussische kansverdeling. Dit wil zeggen dat de gemiddelde hoeveelheid informatie volgens hoofdstuk 3\\*
+H(N) = $\log{(\sigma_n\sqrt{2\pi e})}$\\*
+Als we aannemen dat het continue kanaal een frequentieband met bandbreedte B doorlaat, dan is het ruissignaal volledig gekarakteriseerd door 2B bemonsteringen per seconde. Het informatiedebiet van het ruissignaal wordt dan\\*
+H$_t$(N) = B $\log{(\sigma_n^22\pi e)}$ bit/s\\*\\*
+Aangezien we veronderstelden dat de kansverdeling Gaussisch was, is de hoeveelheid informatie H(N) maximaal. Ruis is niets anders dan de irrelevantie die we hebben ge\"introduceerd in het vorige hoofdstuk. We krijgen\\*
+C$_b$ = max$_{p(x)}$ R = max$_{p(x)}\left[H(Y) - H(Y|X)\right]$ = max$_{p(x)}\left[H(Y)\right] - H(N)$ bit/bemonstering\\*
+Wanneer is H(Y) maximaal? Als we aannemen dat y(t) in vermogen begrensd is, dan is H(Y) maximaal als y(t) een Gaussische verdeling heeft. In dat geval is\\*
+P$_y$ = $\sigma_y^2$ = $\sigma_u^2$ + $\sigma_n^2$\\*
+maxH(Y) = $\log{(\sqrt{2\pi e}\sqrt{\sigma_u^2+\sigma_n^2})}$ bit/bemonstering\\*
+maxH$_t$ = B $\log{\left(2\pi e(\sigma_u^2 + \sigma_n^2)\right)}$ bit/s\\*
+We bekomen de capaciteit per tijdseinheid van het continue kanaal:\\*
+C = 2BC$_b$ = 2B$\left[max\left[H(Y)\right]-H(N)\right]$ = 2B$\left[\log{(\sqrt{2\pi e}\sqrt{\sigma_u^2+\sigma_n^2})} - \log{(\sigma_n\sqrt{2\pi e})}\right]$ = B $\log{\left(\frac{\sigma_u^2 + \sigma_n^2}{\sigma_n^2}\right)}$ = B $\log{\left(1 + \frac{P_u}{P_n}\right)}$ bit/s\\*
+Dit is de formule van Shannon die aantoont dat de capaciteit afhangt van de bandbreedte van het kanaal en de signaal-tot-ruisvermogenverhouding.\\*
+{\scriptsize Zie voorbeeld 6.1 op blz 6.4.}
+\subsection{Onbegrensde bandbreedte}
+De formule van Shannon werd afgeleid in de veronderstelling van een constant vermogendichtheidsspectrum voor de ruis. Dit betekent dat het ruisvermogen evenredig is met de absolute bandbreedte van het kanaal.\\*
+P$_n$ = n$_0$B {\scriptsize Met n$_0$ het ruisvermogen per Hz.} Bijgevolg is\\*
+C = B $\log{1 + \frac{P_u}{n_0B}}$ bit/s\\*
+Na een aantal omvormingen (voor de details, zie blz 6.5), kunnen we de limiet van B $\rightarrow \infty$ berekenen voor de vorige formule:\\*
+$\lim_{B \rightarrow \infty} C$ = $\log_2{(e\frac{P_u}{n_0})}$ = 1.4427$\frac{P_u}{n_0}$ bit/s\\*
+Of omgevormd, het vermogen: P$_u$ = 0.693 n$_0$C\\*
+De hoeveelheid energie per bit: W = 0.693 n$_0$\\*\\*
+Bij termische ruis is de ruisvermogendichtheid\\*
+n$_0$ = kT {\scriptsize k = cte van Boltzmann = 1.38E-23 J/K, T = temperatuur in K}\\*
+W = 0.693 kT = 2.8E-21 J/bit\\*
+{\scriptsize Zie oefening 6.3 op blz 6.6.}
+\section{Hoofdstuk 7 - Fysische transmissiekanalen}
+\subsection{Inleiding}
+De bandbreedte en het signaalvermogen aan de uitgang hangen samen met de overdrachtsfunctie van het kanaal. De overdrachtsfunctie H(f) defini\"eren we als\\*
+H(f) = $\frac{U(f)}{X(f)}$\\*
+U(f) = Fouriergetransformeerde van het signaal aan de uitgang (u(t))\\*
+X(f) = Fouriergetransformeerde  van het signaal aan de ingang (x(t))\\*
+Deze overdrachtsfunctie kan ook geschreven worden als een complexe functie van de frequentie:\\*
+H(f) = $|H(f)|e^{j\phi(f)}$\\*
+$|H(f)|$ is een maat voor de verzwakking en $\phi(f)$ een maat voor de faseverschuiving die het signaal x(t) ondergaat.\\*
+Veronderstel dat x(t) = A$\cos{(2\pi f_1t)}$\\*
+dan is u(t) = $|H(f_1)|A\cos{\left[2\pi f_1t+\phi(f_1)\right]}$
+\subsection{Telefoonlijn}
+Een telefoonlijn bestaat uit twee koperen geleiders. Geleiders hebben een ohmse weerstand R ($\Omega$/km), een inductantie (opgeslagen hoeveelheid magnetische energie) L (H/km), een capaciteit (opgeslagen hoeveelheid elektrische energie) C (F/km) en een conductantie (lekstroom) G (S/km). R en G veroorzaken een verzwakking van het signaal die toeneemt met de frequentie.\\*
+De overdrachtsfunctie H(f) is van de vorm e$^{-\gamma l}$.\\*
+{\scriptsize l = de fysische lengte van het kanaal, $\gamma$ = de propagatieconstante}\\*
+$\gamma$ = $\alpha$ + j$\beta$ = $\left[\left(R + j\omega L\right)\left(G + j\omega C\right)\right]^{\frac{1}{2}}$\\*
+{\scriptsize $\alpha$ = de verzwakkingsconstante, $\beta$ = de faseconstante in rad/m, $\omega$ = de pulsatie in rad/s = 2$\pi$f}\\*
+Dit leidt logischerwijs tot\\*
+de overdrachtsfunctie H(f) = $e^{-\alpha l}e^{-j\beta l}$ met verzwakkingsfunctie $|H(f)|$ = $e^{-\alpha l}$ en faseverschuivingsfunctie $\phi(f) = -\beta l$\\*
+{\scriptsize In de praktijk wordt de verzwakking A van een transmissiekanaal gedefinieerd als de vermogenverhouding van het signaal aan de ingang tot het signaal aan de uitgang en uitgedrukt in dB/km.\\*
+A = 10$\log_{10}{\frac{1}{|H(f)|^2}}$ voor l = 10$^3$m geeft dit: 20$\log_{10}{e^{10^3\alpha}}$ in dB/km\\*
+De fasesnelheid is gegeven door v$_f$ = $\alpha/\beta$\\*
+De tijdsvertraging is gegeven door $\Delta$t = l/v$_f$\\*
+De tijdsvertraging is slechts voor alle frequentiecomponenten dezelfde als v$_f$ = constant\\*\\*
+Zie oefening op slide 7.10. Hiervoor is de wortel uit een complex getal nodig. Gebruik hiervoor:\\*
+$\sqrt{x + iy}$ = $\sqrt{\frac{r + x}{2}\pm i\frac{r-x}{2}}$\\*
+Met r de modulus van het complexe getal. Of voor algemene wortels:\\*
+$\sqrt[n]{x + iy}$ = $r'\cos{(arg')} + r'\sin{(arg')}$\\*
+Met r' = $\sqrt[n]{r}$ en arg' = arg/n + k2$\pi/n$ voor k = 0, 1, \dots, n-1 (arg = $\arctan{(y/x)}$)}
+\subsection{De verbinding tussen 2 antennes}
+Een antenne is te beschouwen als een transducer (!) die een geleide golf omzet in een niet-geleidende golf bij het zenden, en omgekeerd bij het ontvangen. De uitgestraalde vermogendichtheid per eenheid ruimtehoek is richtingsafhankelijk en wordt uitgedrukt door de winstfunctie. Dit is een functie die de verhouding weergeeft van de uitgestraalde vermogendichtheid per eenheid ruimtehoek op de gemiddelde vermogendichtheid die zou bekomen worden als het vermogen in alle richtingen gelijk zou worden uitgestraald. Dit geldt ook voor het ontvangen. De antenne is dus reciprook (!).\\*\\*
+Stel je voor dat we een vermogen P$_z$ in alle richtingen gelijk verdeeld zouden uitzenden, dan is de vermogendichtheid op een afstand R\\*
+$p(R)$ = $\frac{P_z}{4\pi R^2}$ W/m$^2$\\*
+Als we dit vermogen zouden uitzenden met een winstfunctie $G_z(\theta,\phi)$, dan is de vermogendichtheid in de richting $(\theta,\phi)$\\*
+$p(\theta, \phi, R)$ = $\frac{P_z}{4\pi R}G_z(\theta, \phi)$\\*
+De ontvangstantenne wordt gekarakteriseer door een effectief ontvangoppervlak, die afhangt van de winstfunctie van de ontvangantenne:\\*
+$A_e(\theta, \phi) = \frac{\lambda^2}{4\pi}G_o(\theta, \phi)$ met $\lambda$ als golflengte\\*\\*
+Als we de invallende vermogendichtheid vermenigvuldigen met het effectief ontvangoppervlak, dan bekomen we het ontvangen vermogen:\\*
+$P_o = p(\theta, \phi, R)A_e(\theta, \phi)$ = $\frac{P_z}{4\pi R^2}G_z(\theta, \phi)\frac{\lambda^2}{4\pi}G_o(\theta, \phi)$\\*
+{\scriptsize Zie voorbeeld 7.2 op blz 1.13.}
+\subsection{Thermisch ruisvermogen en effectieve ruistemperatuur}
+De belangrijkste bron van ruis is thermische ruis. Ze wordt veroorzaakt door de thermische beweging van elektronen. De ruisspannng is stochastisch van aard waarbij de verdeling een gemiddelde waarde heeft van $E(n) = 0$ en een verdelingsfunctie\\*
+$f(n) = \frac{e^{-n^2/2\sigma^2}}{\sigma \sqrt{2\pi}}$\\*
+De thermische ruisbron stellen we voor door een equivalente spanningsbron met nullastklemspanning (zie uitleg onder figuur 7.16 blz 7.15):\\*
+$\sigma = \sqrt{4kTBR}$\\*\\*
+De spanningsbron levert maximaal vermogen aan een belastingsweerstand als de belastingsweerstand gelijk is aan de inwendige weerstand van de bron:\\*
+$P_n = \frac{\sigma^2}{4R} = kTB$ (in W)\\*
+Per eenheid bandbreedte is de ruisvermogendichtheid\\*
+$n_0 = kT$ (in W/Hz) {\scriptsize (Dit hebben we gebruikt in het vorige hoofdstuk.)}\\*
+{\scriptsize Merk op dat de antenneruistemperatuur alle vormen van ruis bevat. Deze kan totaal verschillen van de temperatuur van de ontvanger.\\*
+Zie voorbeeld 7.3 op blz 7.16.}
+\section{Hoofdstuk 8 - Basisbandtransmissie}
+\subsection{Inleiding}
+Dit hoofdstuk behandelt de overdracht van een uitgangssignaal langs een transmissiekanaal.\\*
+Voor het uitgangssignaal beschouwen we 3 mogelijkheden:\\*
+\begin{itemize}
+\item de informaitebron is discreet, het uitgangssignaal is een bitstroom;
+\item de informatiebron is continu, het uitgangssignaal is een bitstroom (na bemonstering en kwantisatie);
+\item de informatiebron is continu, het uitgangssignaal is ook continu.
+\end{itemize}
+Het transmissiekanaal krijgt ofwel te maken met een bitstroom, ofwel een analoog signaal.\\*
+Voor de overdracthsfunctie H(f) van het transmissiekanaal onderscheiden we twee gevallen:\\*
+\begin{enumerate}
+\item H(f) heeft een basisbandkarakteristiek (frequenties vanaf f$_1$ = 0 Hz tot f$_2$ worden doorgelaten). {\scriptsize Zie figuur 8.1 blz 8.1.}
+\item H(f) heeft een doorlaatbandkarakteristiek (frequenties vanaf f$_1$ $\ne$ 0 Hz tot f$_2$ worden doorgelaten). {\scriptsize Zie figuur 8.2 blz 8.2.}
+\end{enumerate}
+Deze les behandelt het eerste geval, volgende les behandelt het tweede geval.
+\subsection{Rechtstreekse overdracht van een analoog signaal (basisbandkanaal)}
+Het uitgangssignaal u(t) wordt vervormd t.o.v. x(t) door de frequentie-afhankelijke verzwakking. Dit kunnen we compenseren door aan de uitgang van het kanaal een ontvangfilter te plaatsen met overdrachtsfunctie\\*
+$H_f(f) = \frac{U'(f)}{U(f)}$ waarin U'(f) de Fouriergetransformeerde voorstelt van het signaal u'(t).\\*
+We hebben hier enkel de invloed besproken van $|H(f)|$, maar niet van de fase $\phi(f)$ van de overdrachtsfunctie. Veronderstel dat we het analoge signaal x(t) willen overbrengen dat bestaat uit 2 sinuscomponenten:\\*
+$x(t) = A_3\cos{(2\pi f_3t)} + A_4\cos{(2\pi f_4t)}$, dan wordt het uitgangssignaal\\*
+$u(t) = |H(f_3)|A_3\cos{\left[2\pi f_3t+\phi(f_3)\right]} + |H(f_4)|A_4\cos{\left[2\pi f_4 + \phi(f_4)\right]}$\\*\\*
+Omdat volgens hoofdstuk 7: $\phi(f) = -\beta l$ en $\omega = 2\pi f$ kunnen we dit ook herschijven als\\*
+$u(t) = |H(f_3)|A_3\cos{\left[\omega_3\left(t-\frac{\beta(\omega_3)l}{\omega_3}\right)\right]} + |H(f_4)|A_4\cos{\left[\omega_4\left(t - \frac{\beta(\omega_4)l}{\omega_4}\right)\right]}$\\*
+We wensen dat de 2 sinuscomponenten in fase aankomen aan de uitgang. We eisen bijgevolg\\*
+$\frac{\beta(\omega_3)}{\omega_3} = \frac{\beta(\omega_4)}{\omega_4}$\\*
+Dit betekent een lineaire karakteristiek van de faseconstante $\beta$ in functie van de pulsatie $\omega$. Dit noemen we de dispersiekarakteristiek. Als dit niet het geval is, dan treedt er dispersie op en wordt u(t) vervormd t.o.v. x(t). We laten dit aspect verder buiten beschouwing.
+\subsection{Basisbandtransmissie van digitale signalen}
+Kanaalcodering levert opeenvolgende codewoorden c = {$c_1, c_2, \dots, c_n$} waaruit we een willekeurige bit beschouwen. De modulator zet de bit om in een golfvorm $x_j(t)$ die langs het kanaal kan overgebracht worden. De modulator bestaat uit een pulsgenerator en een zendfilter. De pulsgenerator levert rechthoekige pulsen op het ritme van de bitstroom met een spanningsamplitude a. We noemen deze golfvormen $x_p(t)$. De pulsen zijn bijvoorbeeld positief bij een 1 bit en negatief bij een 0 bit. {\scriptsize Zie figuur 8.6. op blz 8.6}\\*
+Rechthoekige pulsen beslaan een te grote bandbreedte. Daarom geeft de zendfilter een bijzondere vorm aan de puls afhankelijk van de kanaaleigenschappen. {\scriptsize Zie figuur 8.7 op blz 8.6.}
+\subsection{Keuze van de golfvorm}
+In figuur 8.7 springen we niet echt zuinig om met de bandbreedte. Hoe korter de pulsherhalingsperiode, hoe groter de nodige bandbreedte. Door bandbreedtebeperking is de golfvorm van het uitgangssignaal u(t) dikwijls meer uitgespreid in de tijd. {\scriptsize Zie figuur 8.8 op blz 8.7.}\\*
+Het feit dat de golfvormen zich nu ook uitspreiden in de naastgelegen tijdsperiodes, heet intersymboolinterferentie. We proberen daarom een golfvorm te kiezen die optimaal is t.o.v. H(f). We beschikken hiervoor over twee vrijheidsgraden. De zendfilter aan de ingang dat de golfvorm x(t) produceert en de ontvangfilter dat de golfvorm u(t) omzet naar u'(t).
+De Fouriergetransformeerde van de golfvorm u'(f) is\\*
+$U'(f) = X(f)H(f)H_r(f)$\\*
+{\scriptsize X(f) en H$_r$(f) zijn de Fouriergetransformeerden van respectievelijk de zendfilter en de ontvangfilter.}\\*\\*
+De golfvorm u'(f) moet zo gekozen worden dat de detectie een zo klein mogelijke foutkans heeft. Golfvormen met een maximum op het gewenste detectietijdstip en die nul zijn op alle andere detectietijdstippen beantwoorden duidelijk aan deze voorwaarde. Een mogelijke golfvorm die hieraan voldoet is\\*
+$u'(t) = 2f_m\frac{2\pi f_mt}{2\pi f_m t}$ {\scriptsize Zie figuur 8.10 op blz 8.9.}\\*
+Deze golfvorm heeft nulpunten om de 1/2f$_m$ seconden. Het is dus aangewezen dat het detectie-interval hiermee samenvalt. In het frequentiedomein is de bandbreedte van deze golfvorm B=f$_m$ Hz. We kunnen in theorie dus een bitstroom met 2B pulsen/s versturen. Er zijn nog wel twee praktische problemen.\\*
+Abrupte overgangen realiseren met filters zoals in figuur 8.10 is erg moeilijk.  Werkelijke overdrachtsfuncties nemen veeleer geleidelijk af. Daarenboven is er nog een probleem van synchronisatie. Indien dit niet helemaal precies gebeurt, verschijnt er toch aanzienlijke intersymboolinterferentie.\\*\\*
+We kunnen beter op zoek gaan naar golfvormen die de gunstige eigenschappen in grote mate behouden, maar tegemoetkomen aan de twee praktische problemen. Een mogelijke vorm voor U'(f) is\\*
+$U'(f) = \frac{1}{2}\left(1+\cos{\frac{\pi f}{2f_m}}\right)$ $|f|\leq 2f_m$ en 0 daarbuiten\\*
+De golfvorm die daarbij hoort:\\*
+$u'(t) = 2f_m\frac{\sin{2\pi f_mt}}{2\pi f_mt}\frac{\cos{2\pi f_mt}}{1-(4f_mt)^2}$ {\scriptsize Zie figuur 8.11 op blz 8.10.}\\*
+Deze golfvorm heeft nulpunten op dezelfde tijdstippen (sinusfactor) en reduceert de maxima van de zijlobben (cosinusfactor). We hebben wel een dubbele bandbreedte nodig (B = 2f$_m$). Het is mogelijk nog andere golfvormen te verzinnen die een compromis vormen tussen de 2 golfvormen. Dit zijn "golfvormen met factor $\alpha$".\\*
+Het tijdsdomein van deze golfvormen wordt gedefini\"eerd als\\*
+$u'(t) = 2f_m\frac{\sin{2\pi f_mt}}{2\pi f_mt}\frac{\cos{\alpha 2\pi f_mt}}{1-(4\alpha f_mt)^2}$\\*
+Het frequentiespectrum wordt gegeven door\\*
+$U'(f) = \frac{1}{2}\left[1-\sin{\frac{2\pi (|f|-f_m)}{4f_m \alpha}}\right]$ voor $(1-\alpha)f_m \leq |f| \leq (1+\alpha)$\\*
+$U'(f) = 1$ voor $|f| < (1-\alpha)f_m$ en $U'(f) = 0$ voor $|f| > (1+\alpha)f_m$\\*
+Deze golfvorm beslaat een bandbreedte\\*
+$B = (1+\alpha)f_m$\\*
+Er kunnen $\frac{2}{1+\alpha}B$ golfvormen/s worden doorgestuurd.
+\subsection{Meer dan 2 verschillende golfvormen}
+Wat als we nu meer golfvormen zouden doorsturen met een verschillende amplitude? {\scriptsize Zie figuur 8.12 op blz 8.12}\\*
+Met 4 verschillende golfvormen kunnen we 2 bit*/symbool voorstellen.\\*
+Het transmissiedebiet r$_s$ is het aantal discrete golfvormen/s (= baud = aantal symbolen/s) dat wordt overgebracht.\\*
+Het transmissiedebiet r$_b$ is het aantal bit*/s dat wordt overgebracht. We vinden\\*
+r$_b$ = n*r$_s$ {\scriptsize (n = bit*/golfvorm)}\\*\\*
+Aangezien de bandbreedte enkel afhangt van de golfvorm en niet van het aantal verschillende golfvormen, lijkt het alsof we een wondermiddel hebben gevonden om het transmissiedebiet op te drijven. Toch is er een beperking. En die zit in de signaal-tot-ruisvermogenverhouding. We moeten namelijk de verschillende amplitudes bij ontvangst nog van elkaar kunnen onderscheiden. We geven zonder bewijs dat de waarschijnlijkheid dat een golfvorm foutief wordt ontvangen:\\*
+$P_g=\frac{2(M-1)}{M}Q\left(\sqrt{\frac{6\log_2{M}}{M^2-1}\frac{E_b}{n_0}}\right)$ {\scriptsize (M = 2$^n$)}\\*
+$Q(z) = \frac{1}{2\pi}\int_z^\infty{e^{-\lambda^2/2}d\lambda} \approx \frac{1}{\sqrt{2\pi}z}e^{-z^2/2}$ voor z $\geq$ 3\\*
+E$_b$ = de gemiddelde energie per bit* aan de uitgang van het transmissiekanaal:\\*
+$E_b = \frac{P_u}{r_b}$\\*
+n$_0$ = het gemiddeld ruisvermogen per eenheid bandbreedte aan de uitgang van het transmissiekanaal:\\*
+n$_0$ = kT = $\frac{P_n}{B}$
+\section{Hoofdstuk 9 - Doorlaatbandtransmissie}
+\subsection{Inleiding}
+Vaak worden frequenties in de buurt van 0 Hz niet doorgelaten of heeft het kanaal slechts een beperkte bandbreedte rond een centrale frequentie.
+\subsection{Overbrenging van analoge signalen via een doorlaatbandkanaal}
+Veronderstel dat we een signaal willen overbrengen op een bepaald kanaal. We kunnen dit signaal niet rechtstreeks aanleggen. We hebben hiervoor een draaggolf nodig:\\*
+$x_c(t) = A_c\cos{(2\pi f_ct + \phi_c)}$ {\scriptsize (A$_c$ = de amplitude, f$_c$ = de draaggolffrequentie, $\phi_c$ = de fase)}\\*
+We kunnen deze drie parameters gebruiken om deze te laten vari\"eren volgens het verloop van x(t). We beperken ons tot amplitudemodulatie.\\*
+De eenvoudigste manier om de amplitude A$_c$ te laten vari\"eren volgens x(t) is het vermenigvuldigen van x(t) met de draaggolf $A_c\cos{2\pi f_ct}$. Het product\\*
+$x_m(t) = A_cx(t)\cos{2\pi f_ct} = A(t)\cos{2\pi f_ct}$\\*
+wordt overgebracht langs het doorlaatbandkanaal. {\scriptsize (Zie figuur 9.3 op blz 9.3.)}\\*
+Op basis van de frequentieverschuivingseigenschap van Fouriergetransformeerden is\\*
+$X_m(f) = \frac{1}{2}A_c\left[X(f-f_c) + X(f+f_c)\right]$\\*
+De frequentieband bestreken door het informatiesignaal  (zie figuur 9.3a, van 0 tot f$_x$) noemen we de basisband. Het gemoduleerde signaal bestaat uit 2 zijbanden (zie figuur 9.3b) en beslaat een bandbreedte B = 2f$_x$ dat het dubbele bedraagt van het basisbandsignaal.
+\subsection{Overbrenging van digitale signalen via een doorlaatbandkanaal}
+Binaire signalen kunnen op verschillende manieren door de draaggolf worden weergegeven. Zie figuur 9.5 op blz 9.5. Bij amplitudeverschuiving (9.5a) wordt er gekozen tussen 2 waarden van de amplitude. Bij frequentieverschuiving (9.5b) wordt er gekozen tussen 2 waarden van de frequentie. Bij faseverschuiving (9.5c) wordt er gekozen tussen 2 waarden van de fase. We beperken ons tot aan-uitmodulatie (een vorm van amplitudeverschuiving). {\scriptsize (Zie figuur 9.6 op blz 9.6)}\\*
+We herhalen nogmaals (ditmaal voor digitale signalen):\\*
+$x_m(t) = A_cx(t)\cos{2\pi f_ct} = A(t)\cos{2\pi f_ct}$\\*
+$X_m(f) = \frac{1}{2}A_c\left[X(f-f_c) + X(f+f_c)\right]$\\*\\*
+Zoals we gezien hebben in les 8, kunnen pulsen met een rechthoekig frequentiespectrum elkaar opvolgen met een tijdsinterval T$_b$ = $\frac{1}{2f_m}$. Bij aan-uitmodulatie is hiervoor een bandbreedte B = 2f$_x$ vereist. Doorlaatbandkanaal kan bijgevolg maximaal B pulsen/s overbrengen. Het frequentiespectrum van de ontvangen gemoduleerde draaggolf:\\*
+$U'_m(f) = X_m(f)H(f)H_r(f)$\\*
+Ook hier kunnen we de "golfvorm met factor $\alpha$" toepassen. Zo'n golfvorm U'(t) beslaat een bandbreedte $B = 2(1+\alpha)f_x$.\\*
+Deze golfvormen kunnen elkaar opvolgen met een tijdsinterval\\*
+$T_b = \frac{1}{2f_x} = \frac{1+\alpha}{B}$\\*
+Er kunnen dus $\frac{B}{1+\alpha}$ pulsen/s overgebracht worden.
+\subsection{Meer dan 2 verschillende golfvormen}
+We kunnen het transmissiedebiet ook hier opdrijven door het benutten van meer dan 2 verschillende golfvormen. Verschillende golfvormen kunnen we realiseren door verschil in amplitude, frequentie of fase. We bespreken in dit onderdeel enkele voorbeelden van analoge telefoonkanalen. De bandbreedte is beperkt tot 300-3400Hz.
+\subsubsection{[Voorbeeld] V23}
+Frequentieverschuiving op basis van 2 golfvormen met een frequentie van respectievelijk 1200 en 2200 Hz.\\*
+Transmissiedebiet: 1200 baud = 1200bit*/s\\*
+{\scriptsize (Zie figuur 9.10 op blz 9.10)}
+\subsubsection{[Voorbeeld] V26bis}
+Faseverschuiving op basis van 4 golfvormen (verschuiving van 90$^o$)\\*
+Transmissiedebiet: 1200 baud = 2400bit*/s\\*
+Factor $\alpha$ = 1\\*
+{\scriptsize (Zie figuur 9.11a op blz 9.11)}
+\subsubsection{[Voorbeeld] V27ter}
+Faseverschuiving op basis van 8 golfvormen (verschuiving van 45$^0$)\\*
+Transmissiedebiet: 1600 baud = 4800bit*/s\\*
+Factor $\alpha$ = 0.5\\*
+{\scriptsize (Zie figuur 9.11b op blz 9.11)}
+\subsubsection{[Voorbeeld] V32}
+Zowel amplitude- en/of faseverschuiving op basis van 16 verschillende golfvormen (QAM = quadrature amplitude modulatie)\\*
+Transmissiedebiet: 2400 baud = 9600bit*/s\\*
+Factor $\alpha$ = 0.125\\*
+{\scriptsize (Zie figuur 9.12 op blz 9.12)}\\*\\*
+Modems met hogere transmissiedebieten (14400; 16800; 19200; 28800 bit*/s) kunnen volgens hetzelfde stramien bereikt worden. De signaal-tot-ruisvermogenverhouding is hier de bepalende factor voor de maximum transmissiedebiet dat behaald kan worden. De waarschijnlijkheid dat een golfvorm foutief gedetecteerd wordt voor QAM (zoals in voorbeeld V32):\\*
+$P_g \leq 4Q\left(\sqrt{\frac{3log_2{M}}{M-1}\frac{E_b}{n_0}}\right)$\\*
+{\scriptsize (Met Q, E$_b$, M en n$_0$ gedefini\"eerd zoals op het einde van hoofdstuk 8)}
+\section{Hoofdstuk 10 - Multiplexen}
+\subsection{Inleiding}
+In de vorige hoofdstukken zijn we ervan uitgegaan de we altijd de maximale capaciteit van het kanaal zouden gebruiken. Vaak is dit niet het geval: de capaciteit die we dan nodig hebben is een stuk lager dan de capaciteit die beschikbaar wordt gesteld door het fysisch kanaal. De bedoeling is natuurlijk om zoveel mogelijk gebruik te maken van de beschikbare capaciteit. We kunnen dit verwezelijken door meerdere tranmissiekanalen op hetzelfde fysisch kanaal te plaatsen.
+\subsection{Frequentiemultiplexing}
+Veronderstel 3 informatiesignalen die elk beperkt zijn in absolute bandbreedte ($f_1$, $f_2$ en $f_3$). Elk signaal wordt gemoduleerd op een verschillende draaggolffrequentie ($f_{c1}$, $f_{c2}$ en $f_{c3}$). Uiteraard moet bij de keuze van de draaggolffrequenties ervoor gezorgd worden dat er tussen elk signaal nog een veiligheidszone overblijft. Elk modulatieprincipe kan hier aangewend worden. We gebruiken in dit voorbeeld amplitudemodulatie.\\*
+De drie gemoduleerde draaggolven worden gesommeerd tot \'e\'en samengesteld multiplex signaal x$_M$(t). {\scriptsize (Zie figuur 10.1 op blz 10.2)}\\*
+{\scriptsize Zie voorbeeld 10.2 op blz 10.2.}
+\subsection{Tijdmultiplexing}
+Bij tijdsmultiplexing bemonsteren we de continue informatiesignalen om beurt met een bepaalde frequentie. We plaatsen bemonsteringen naast elkaar zoals op figuur 10.4 op blz 10.5.\\*
+{\scriptsize Zie voorbeeld 10.3 op blz 10.6.}
+\section{Hoofdstuk 11 - Elektrische circuits}
+\subsection{Basisgrootheden}
+\subsubsection{Spanning, stroomsterkte}
+Het scheiden van positieve en negatieve elektrische lading (een veelvoud van de lading van een elektron) cre\"eert een spanning. Spanning is dus elektrische energie per eenheid van lading:\\*
+$v = \frac{dw}{dq}$ (in V)\\*
+De beweging van elektrische lading is de hoeveelheid elektrische lading die per tijdeenheid langs een bepaald punt vloeit, dit is elektrische stroomsterkte:\\*
+$i = \frac{dq}{dt}$ (in A)\\*
+{\scriptsize (kleine letters = algemene tijdsafhankelijkheid, grote letters = de grootheden zijn constant in de tijd (gelijkspanning, gelijkstroom))}\\*
+\subsubsection{Vermogen}
+Vermogen is de hoeveelheid energie per tijdseenheid. Het is dus de afgeleide van elektrische energie naar de tijd:\\*
+$p = \frac{dw}{dt} = \frac{dw}{dq}\frac{dq}{dt} = v*i$ (in W)\\*
+\subsubsection{Spanningbronnen}
+We zullen het hier hebben over ideale spanningbronnen. Later zullen we praten over werkelijke spanningsbronnen.\\*
+Ideale spanningsbronnen worden ingedeeld in twee klassen: onafhankelijke en afhankelijke. Onafhankelijke spanningsbronnen hebben een voorgeschreven spanningsbron die niet afhangt van de stroomsterkte die geleverd wordt. Afhankelijke spanningsbronnen hangt af van ofwel de spanning ofwel de stroomsterkte binnen het circuit. We spreken van respectievelijk een spanningsgestuurde en een stroomgestuurde spanningsbron. Zie figuren op slide 11.3 voor de bijbehorende symbolen.
+\subsubsection{Stroombronnen}
+Ook hier zullen we het hebben over ideale stroombronnen.\\*
+Stroombronnen worden zoals spanningsbronnen ingedeeld in onafhankelijke, spanningsgestuurde (afhankelijke) en stroomgestuurde (afhankelijke) stroombronnen. Zie figuren op slide 11.4 voor de bijbehorende symbolen.
+\subsection{Passieve componenten}
+Het verband tussen de spanning en de stroomsterkte door een weerstand is bepaald door de wet van Ohm:\\*
+$v_R = R*i_R$ {\scriptsize(Kleine letters, want de wet van Ohm blijft algemeen geldig.)}\\*
+De stroomsterkte die door een weerstand vloeit, veroorzaakt een spanningsval.\\*
+De spanning aan de klemmen van een spoel is bepaald door de afgeleide van de stroomsterkte naar de tijd:\\*
+$v_L = L*\frac{di_L}{dt}$\\*
+De stroomsterkte in een condensator is bepaald door de afgeleide van de klemspanning naar de tijd:\\*
+$i_C = C*\frac{dv_C}{dt}$
+\subsection{Wetten van Kirchoff}
+1ste wet: Som van ingaande stromen = som van uitgaande stromen.\\*
+2de wet: Som van de spanningen in elke gesloten maas (kring) is nul.\\*
+Voor de tweede wet is het teken van een spanningsbron negatief als deze stroom wil laten vloeien in tegengestelde richting of wanneer er een spanningsval optreedt in dezelfde richting. Het teken van een spanningsbron is positief als er een spanningsval optreedt in tegengestelde richting.\\*
+{\scriptsize Zie tekeningen op slide 11.6.}
+\subsection{Werkelijke spannings- en stroombronnen}
+\subsubsection{Werkelijke spanningsbron}
+Als voorbeeld nemen we een autobatterij met een bronspanning van 12V en een (kleine) inwendige weerstand R$_i$. De bronspanning blijft onafhankelijk van de belastingsweerstand R$_b$. De klemspannings echter wordt afhankelijk van de stroomsterkte door de belastingsweerstand R$_b$, door de inwendige spanningsval in de inwendige weerstand R$_i$. Deze verbanden tussen de spanning over de belastingsweerstand en de stroom worden bepaald door de wet van Ohm. Op basis van de twee vergelijkingen worden V$_b$ en I$_b$ bepaald. De oplossing wordt grafisch weergegeven in het werkingspunt Q op slide 11.7.\\*
+Als de belastingsweerstand R$_b$ gelijk is aan nul, dan krijgen we de formule voor de kortsluitstroom:\\*
+$I_k = \frac{V_S}{R_i}$\\*
+Deze waarde bevindt zich helemaal rechts op de grafiek. Wanneer de belastingsweerstand groter wordt, zal er minder stroom vloeien, en zal het punt Q naar links verschuiven over de rechte. Wanneer de belastingsweerstand 'oneindig' wordt, kan de keten als open worden beschouwd. Dit punt ligt helemaal bovenaan (links) op de grafiek in het punt V$_S$. Er vloeit dan uiteraard geen stroom. De spanning over de weerstand die dan ontstaat (die van de batterij, met interne weerstand) is de nullastklemspanning.
+\subsubsection{Spanningsdeler}
+Vaak heeft men een andere spanning nodig dan deze van de bronspanning. Hiervoor gebruikt men een spanningsdeler. Zie de figuren op slide 11.8.\\*
+De nullastklemspanning kan op dezelfde manier berekend worden als die van de werkelijke spanningsbron:\\*
+$V_u = R_2I = \frac{R_2}{R_1 + R_2}V_S$\\*
+De belaste toestand wordt dan:\\*
+$V_u = R_{AB}I = \frac{R_2\parallel R_b}{R_1 + R_2\parallel R_b}V_S$ (met $R_{AB} = R_2\parallel R_b = (\frac{1}{R_2} + \frac{1}{R_b})^{-1}$)
+\subsubsection{Werkelijke stroombron}
+Eenzelfde analyse kunnen we maken bij de werkelijke stroombron. In dit geval staat een (grote) inwendige weerstand parallel met de bronstroom. De stroomsterkte door de belastingsweerstand wordt afhankelijk door van de klemspanning (en dus de stroom door de inwendige weerstand). De kortsluitstroom is de stroom die door de belasting vloeit als R$_b$ = 0:\\*
+$I_k = I_s$\\*
+De nullastklemspanning is de klemspanning als de belasting een open keten is:\\*
+$V_0 = R_iI_s$\\*
+Opnieuw kunnen we dit grafisch voorstellen door de grafiek op slide 11.9.
+\subsubsection{Stroomdeler}
+In een stroomdeler wordt de stroom verdeeld over twee weerstanden die parallel geschakeld zijn. (Zie slide 11.10) Hieruit kunnen we onmiddelijk de volgende formules vinden:\\*
+$I_1 = I_s\frac{R_2}{R_1+R_2}$\\*
+$I_2 = I_s\frac{R_1}{R_1+R_2}$
+\subsection{Th\'evenin-Norton}
+\subsubsection{Th\'evenin-equivalent}
+Soms is het interessant om een schakeling te vereenvoudigen door gebruik te maken van een Th\'evenin-equivalent. (Zie slide 11.11) We kunnen ook hier de kortsluitstroom en de nullastklemspanning berekenen. Hieruit vinden we de Th\'evenin-bronspanning en de Th\'evenin inwendige weerstand:\\*
+$V_{Th} = \frac{R_2}{R_1+R_2}V_s$\\*
+$R_{Th} = \frac{R_1R_2}{R_1+R_2}$
+\subsubsection{Norton-equivalent}
+We kunnen ook gebruik maken van een Norton-equivalent. (Zie slide 11.12) We berekenen de kortsluistroom en de nullastklemspanning. Hieruit vinden we:\\*
+$I_N = \frac{R_1}{R_1+R_2}I_s$\\*
+$R_N = R_1+R_2$
+\subsubsection{Th\'evenin $\leftrightarrow$ Norton}
+Elektrische circuits waarin zowel spannings- als stroombronnen voorkomen kunnen we spanningsbronnen vervangen door een equivalente stroombron (of omgekeerd) zodat de schakeling enkel bronnen van dezelfde soort bevat. Door gebruik te maken van kortsluistroom en nullastklemspanning en deze equivalent te eisen vinden we:\\*
+$V_{Th} = R_NI_N$\\*
+$R_{Th} = R_N$
+\subsection{Het oplossen van netwerken}
+We behandelen een aantal methodes om elektrische netwerken op te lossen.
+\subsubsection{1 bron met meerdere R}
+De 1ste methode is de reductie-expansiemethode. Via reductie herleiden we de verzameling weerstanden tot een equivalente weerstand. We berekenen de stroom geleverd door deze equivalente weerstand. Deze wijze is analoog voor een stroombron. De som van weerstanden die parallel geschakeld zijn:\\*
+$R_{tot} = (\frac{1}{R_1} + \frac{1}{R_2} + \dots + \frac{1}{R_n})^{-1}$\\*
+De som van in serie geschakelde weerstanden is gewoon de som van de weerstanden.
+\subsubsection{Meer dan 1 bron}
+Voor netwerken met meer dan 1 bron, gebruiken we de wet van Ohm en de 2 wetten van Kirchoff. Het is de bedoeling dat de mazen en knooppunten zo gekozen worden zodat het netwerk opgelost kan worden.
+\subsubsection{Verschillende bronnen}
+Hier kan superpositie van pas komen. Het superpositie theorema is een manier om complexe netwerken gemakkelijk op te lossen. Door alle spanningen, stromen, impedanties, $\dots$ in alle takken te berekenen met telkens maar 1 bron. Elke spanningsbron wordt vervangen door een kortsluiting, elke stroombron wordt vervangen door een open keten.
+\subsubsection{Niet-lineaire belasting}
+In werkelijkheid komen we vaak niet-lineaire belastingen tegen. Het eenvoudigste voorbeeld hiervan is een diode.\\*
+De geleiding is voorwaarste richting (de richting waarin de diode geleidt) wordt beschreven door volgende vergelijking:\\*
+$I_D = I_0e^{V_D/(kT/q)}$ {\scriptsize (de D van diode)}\\*
+We kunnen ook de 2de wet van Kirchoff ook nog toepassen op het schema op slide 11.18. Dit levert volgende vergelijking (merk op dat er 3 elementen zijn die de spanning be\"invloeden):\\*
+$V_s - V_D - I_DR_i = 0$ Of omgevormd:\\*
+$I_D = \frac{V_s}{R_i} - \frac{V_D}{R_i}$\\*
+Deze vergelijkingen leveren een werkingspunt op. Zie grafiek op slide 11.18.
+\section{Hoofdstuk 12 - Elektrische circuits (2)}
+\subsection{Inleiding}
+In dit hoofdstuk behandelen we sinuso\"idale spannings- en stroombronnen. Deze worden bepaald door een frequentie f, pulsatie $\omega$ of een periode T. $\phi$ stelt de fase voor op het moment t = 0:\\*
+$v(t) = V_m\cos{(\omega t+\phi)}$\\*
+De effectieve waarde is de kwadratisch gemiddelde waarde:\\*
+$V_e = \left[\frac{1}{T}\int_0^TV^2(t)dt\right]^{1/2} = \frac{V_m}{\sqrt{2}}$\\*
+De effectieve waarde van een sinuso\"idale spanning is de waarde van een equivalente gelijkspanning (met dus die effectieve waarde als spanning) die eenzelfde hoeveelheid elektrische energie dissipeert over een weerstand gedurende \'e\'en periode als die sinuso\"idale spanning.
+\subsection{Complexe analyse}
+We zullen in de komende secties de voorkeur geven aan complexe analyse. We zullen eerst aantonen hoe we overgaan van een sinuso\"idale spanning naar de bijbehorende complexe spanning V:\\*
+$v(t) = \sqrt{2}V_e\cos{(\omega t + \phi)} = Re\left[\sqrt{2}Ve^{j\omega t}\right]$ (met $V = V_ee^{j\phi}$)\\*
+V kunnen we voorstellen door een vector in het complexe vlak. Deze staat afgebeeld op slide 12.2.
+\subsection{Tijdsafhankelijke weerstanden}
+\subsubsection{Weerstand}
+Een weerstand is zuiver re\"eel. De complexe impedantie:\\*
+$Z_R = R$\\*
+Hieruit volgt dat de spanning over de weerstand en de bronspanning dezelfde fase hebben (ze zijn ook even groot). Zie het vectordiagram op slide 12.3.\\*
+Aangezien de weerstand re\"eel is, zal de stroomsterkte ook dezelfde fase hebben als de spanning. We geven nog de formules voor de spanning en stroomsterkte:\\*
+$v_s = \sqrt{2}V_e\cos{(\omega t + \phi)}$\\*
+$i = v_s/R$
+\subsubsection{Spoel}
+De weerstand is zuiver imaginair. De complexe impedantie:\\*
+$Z_L = j\omega L$\\*
+Hieruit volgt dat de spanning over de spoel 90$^o$ voorloopt op de stroomsterkte. Zie de grafiek op het vectordiagram 12.4.\\*
+$i_s = \sqrt{2}I_e\cos{(\omega t+ \phi)}$\\*
+$v_l = L\frac{di}{dt} = \omega L\sqrt{2}I_e\cos{(\omega t+ \phi + 90^o)}$\\*
+{\scriptsize ($\frac{d\cos{x}}{dx} = -\sin{x} = \cos{(x+90)}$)}
+\subsubsection{Condensator}
+Uit de 2de wet van Kirchoff volgt dat de spanning over de condensator gelijk is aan de bronspanning.\\*
+$v_c = v_s$\\*
+De complexe impedantie:\\*
+$Z_C = \frac{-j}{\omega C}$\\*
+Hieruit volgt dat de spanning over de condensator 90$^o$ achterloopt op de stroomsterkte. De spanning over de condensator en de bronspanning hebben dezelfde fase. Zie het vectordiagram op de slide 12.5.\\*
+$i = C\frac{dv_c}{dt} = \omega C\sqrt{2}V_e\cos{(\omega t+\phi+90^o)}$
+\subsubsection{Impedantie Z}
+De impedantie Z stelt een vervangingsimpedantie voor. Dit is een combinatie van weerstanden, spoelen en condensatoren. Deze kan door de expansie-reductiemethode van hoofdstuk 11 berekend worden. De complexe impedantie:\\*
+$Z = R + jX = |Z|e^{j\phi_z}$\\*
+Volgens de 2de wet van Kirchoff is de spanning over de impedantie is gelijk aan de bronspanning. De stroomsterkte kan berekend worden via de wet van Ohm:\\*
+$V_z = V_s = ZI$\\*
+Het vectordiagram op slide 12.6 is getekend onder de aanname dat $\phi_z$ positief zou zijn.
+\subsection{Schakelingen}
+\subsubsection{Serieschakeling}
+In een serieschakeling kunnen we de impedanties die in deze schakeling zitten gewoon optellen, zoals gewone weerstanden. Het vectordiagram kan op exact dezelfde manier bekomen worden als bij de specifieke impedanties.
+\subsubsection{Parallelschakeling}
+De parallelschakeling van impedanties wordt op juist dezelfde manier behandeld als weerstanden in een parallelschakeling:\\*
+$Z_{tot} = (\frac{1}{Z_1} + \frac{1}{Z_2} + \dots + \frac{1}{Z_n})^{-1}$\\*
+Wanneer een tak van de parallelschakeling opnieuw een serie- of parallelschakeling is, dan moet deze eerst uitgerekend worden volgens de voorgaande methodes. Het vectordiagram kan op exact dezelfde manier bekomen worden als bij de specifieke impedanties.
+\subsubsection{Serieresonantie}
+We defini\"eren een serieresonantiekring als een serieschakeling van een weerstand, een spoel en een condensator.\\*
+De impedantie wordt dan:\\*
+$Z = R + j\omega L - \frac{j}{\omega C}$ met\\*
+$|Z| = \left[R^2 + (\omega L - \frac{1}{\omega C})^2\right]^{1/2}$\\*
+De vervangingsimpedantie is dus complex maar bij de resonantiefrequentie, re\"eel. Omgezet naar $\omega$:\\*
+$\omega = \frac{1}{\sqrt{LC}}$\\*
+Als we $\omega$ invullen in de formule van de impedantie, dan valt het complexe deel inderdaad weg. Merk ook op dat Z hier minimaal wordt (en I dus maximaal), aangezien R altijd constant blijft.\\*
+Als de frequentie kleiner is dan de resonantiefrequentie, dan is het imaginaire deel van de vervangingsimpedantie capacitief. Als de frequentie hoger ligt, dan is het imaginaire deel inductief. {\scriptsize (Onthoudt dit met het volgende ezelsbruggetje: een condensator heeft tijd nodig voor het laden/ontladen, wat mogelijk is bij lage frequenties. Lage frequenties $\rightarrow$ capacitief.)}
+\subsubsection{Parallelresonantie}
+We defini\"eren een parallelresonantie als een parallelschakeling van een weerstand, een spoel en een condensator.\\*
+De impedantie wordt dan:\\*
+$Z = \left[\frac{1}{R} + \frac{1}{j\omega L} + j\omega C\right]^{-1}$ met\\*
+$|Z| = \left[\frac{1}{R^2} + (\omega C - \frac{1}{\omega L})^2\right]^{-1/2}$
+We noteren hier ook een resonantiefrequentie. Deze blijft dezelfde als bij de serieresonantie:\\*
+$\omega = \frac{1}{\sqrt{LC}}$\\*
+Merk op dat Z hier, in tegenstelling tot serieresonantie, maximaal wordt. Bij frequentie resonantie geldt namelijk dat $|Z|$ = R en alles wat erbij komt, zal in de noemer terechtkomen en Z dus verkleinen.\\*
+Als de frequentie kleiner is dan de resonantiefrequentie dan is het imaginaire deel inductief. Bij grotere frequenties is het imaginaire deel capacitief. {\scriptsize (Vervolg van het ezelsbruggetje: Alles is hier omgekeerd. De redenering van het ezelsbruggetje dus ook.)}
+\subsection{Vermogen}
+Het vermogen is bepaald door het product van spanning en stroom:\\*
+$v = V_m\cos{(\omega t+\phi_v)}$ en $i = V_m\cos{(\omega t+\phi_i)}$\\*
+$p = vi = V_mI_m\cos{(\omega t+\phi_v)}\cos{(\omega t+\phi_i)}$\\*
+De uitwerking op slide 12.11 maakt gebruik van de formules van Simpson. We geven hier de uitkomst:\\*
+$p = V_eI_e\cos{(\phi_v-\phi_i)}\left[1+\cos{2(\omega t+\phi_v)}\right]+V_eI_e\sin{(\phi_v-\phi_i)}\sin{2(\omega t+\phi_v)}$\\*
+Het eerste deel van de formule is het tijdsafhankelijk actief vermogen p$_a$, het tweede deel van de formule is het tijdsafhankelijk reactief vermogen p$_r$.\\*
+Het tijdsafhankelijk actief vermogen bestaat uit een constante term en een oscillerende term. Het tijdsafhankelijk reactief vermogen bevat enkel een oscillerende term. De oscillaties gebeuren op de dubbele frequentie van spanning en stroom.
+We defini\"eren het actief vermogen P$_a$ als de gemiddelde waarde van het tijdsafhankelijk actief vermogen:\\*
+$P_a = V_eI_e\cos{(\phi_v-\phi_i)}$\\*
+We defini\"eren het reactief vermogen P$_r$ als de maximale waarde van het tijdsafhankelijk reactief vermogen:\\*
+$P_r = V_eI_e\sin{(\phi_v-\phi_i)}$\\*
+\subsection{Complex vermogen}
+We defini\"eren het complex vermogen als het product van de complexe spanning met het complex toegevoegde van de stroom.\\*
+Het re\"ele deel is bepaald door het product van de effectieve waarde van de spanning en stroom, met de cosinus van het faseverschil tussen spanning en stroom. Dit stemt overeen met het actieve vermogen P$_a$. Het imaginaire deel is bepaald door het product van de effectieve waarde van spanning en stroom met de sinus van het faseverschil tussen spanning en stroom. Dit stemt overeen met het reactieve vermogen P$_r$. We kunnen dus samenvatten dat het complex vermogen: $S = VI^* = P_a + jP_r$
+De fysische betekenis van reactief vermogen is vermogen da heen en weer gaat tussen de bron en het reactieve element (spoel/condensator), maar niet wordt gedissipeerd.\\*\\*
+Bekijk als afsluiter van dit hoofdstuk een eerder eenvoudig voorbeeld van een algemene schakeling en bijbehorend vectordiagram op slides 12.13 en 12.14.
+\section{Hoofdstuk 13 - Filters}
+\subsection{Inleiding}
+Voor dit hoofdstuk is het van belang dat je de twee vorige hoofdstukken goed begrepen hebt. De formules van de filters staan ook in het formularium.\\*
+Omdat dit en volgend hoofdstuk iets moeilijker zijn, zullen ook de slides samengevat zijn. Dit zal telkens duidelijk aangeduid staan in de titels.\\*
+Een analoog signaal kan geschreven worden als een som van sinuso\"idale signalen. Een periodisch signaal kan geschreven worden als een oneindige discrete som van sinuso\"idale signalen bestaande uit een constante term (fundamentele of harmonische (=veelvoud van de fundamentele) frequentie). Een niet-periodisch signaal kan geschreven worden als een oneindige continue som van sinuso\"idale signalen.\\*
+Filteren bestaat erin signaalcomponenten in een deelfrequentie te behouden en in een ander deelgebied te verzwakken of zelfs te verwijderen. We stellen een filter voor door de overdrachtsfunctie:\\*
+$H(f) = \frac{V_u(f)}{V_i{(f)}}$ {\scriptsize $V_u(f) = uitgangssignaal, V_i() = ingangssignaal$}\\*
+\subsection{[Slides] Overdrachsfunctie - algemeen}
+Veronderstel: $H(f) = K\frac{(1+jf/f_n)}{jf(j+jf/f_p)}$\\*
+$|H(f)| = K\frac{|1+jf/f_n|}{f|1+jf/f_p|}$\\*
+$\phi(f) = \psi_1-90^o-\beta_1$ {\scriptsize (met $\tan{\psi_1} = f/f_n$} en $\tan{\beta_1} = f/f_p$)\\*
+$1+jf/f_n$\\*
+= 1 als $f<<f_n (\psi_1 = 0^o$)\\*
+= $1+j$ als $f=f_n$\\*
+= $jf/f_n$ als $f>>f_n$ ($\psi_1=90^o$)\\*
+$(1+jf/f_p)^{-1}$\\*
+= 1 als $f<<f_p$ ($\beta_1 = 0^o$)\\*
+= $(1+j)^{-1}$ als $f=f_n$\\*
+= $-jf_p/f$ als $f>>f_p$ ($\beta_1=-90^o$)
+\subsection{[Slides] Het Bode-diagram}
+Hoe tekenen we nu het Bode-diagram?\\*
+Wat uiteindelijk op het Bode-diagram moet staan is $|H(f)|_{dB}$. Aangezien we werken met een logschaal:\\*
+$|H(f)|_{dB}$ = $10\log_{10}{|H(f)|^2}$ = $20\log_{10}{|H(f)|}$\\*
+= $20\log_{10}{K} - 20\log_{10}{f} + 20\log_{10}{|1+jf/f_n|} - 20\log_{10}{|1+jf/f_p|}$\\*
+We veronderstellen dat K, $f_n$ en $f_p$ gegeven zijn. We kunnen nu het Bode-diagram eenvoudig tekenen. We gebruiken het Bode-diagram van slide 13.5 als referentie.\\*
+De rechten $20\log_{10}{K}$ en $-20\log_{10}{|f|}$ zijn eenvoudig af te leiden. De andere twee rechten komen pas in actie als hun 'kantelfrequentie' wordt bereikt (merk op dat dit een asymptotische benadering is en dus de bevindingen van de vorige sectie gebruikt worden). Voor deze kantelfrequentie zal de logfunctie namelijk 0 zijn (de log van 1 is 0).\\*
+Tel deze 4 rechten op en je bekomt het resultaat. Merk op dat het echte Bode-diagram vloeiender verloopt.
+\subsection{[Slides] Overdrachtsfunctie berekenen}
+Om de overdrachtsfucntie van een filter te berekenen maken we gebruik van de 2de wet van Kirchoff. Stel deze vergelijking op:\\*
+$V_s - V_1 - V_2 = 0$\\*
+Dan stel je alle spanningen in functie van de stroom (via de wet van Ohm). Deze vergelijkingen vul je in in je eerste vergelijking. Zet om naar een vergelijking voor de stroom:\\*
+$V_s - Z_1I - Z_2I = 0$\\*
+$I = \frac{V_s}{Z_1 + Z_2}$\\*
+Vul deze vergelijking in in de vergelijking die we hadden gevonden voor de stroomval van de impedantie waar we onze klemmen over hebben gezet (veronderstel het algemeen geval dat dit Z$_2$ is):\\*
+$V_2 = \frac{Z_2}{Z_2 + Z_1}V_s$\\*
+Uit de verhouding van (in dit geval) V$_2$ en V$_s$ vinden we de overdrachtsfunctie:\\*
+$H(f) = \frac{Z_2}{Z_2 + Z_1}$\\*
+Deze formule zullen we in de volgende secties gebruiken om de overdrachtsfunctie te berekenen.
+\subsection{Eerste orde laagdoorlaatfilter}
+De frequenties boven een bepaalde kantelfrequentie worden verwijderd.\\*
+We zoeken de overdrachtsfunctie van een R,C filter. Zie figuur 13.1 op blz 13.2.\\*
+De overdrachtsfunctie kan berekend worden zoals in het vorige onderdeeltje. Voor een volledige uitwerking van deze berekening, zie slide 13.8 (je kan hier vertrekken vanaf de algemene formule voor de overdrachtsfunctie). We noteren hier het resultaat.\\*
+We leggen in frequentie f aan. Het uitangssignaal V$_u$ is de spanningsval over C:\\*
+$H(f) = \frac{1}{1+j(f/f_b)} = |H(f)|e^{\phi(f)}$ met absolute waarde:\\*
+$|H(f)| = \frac{1}{\sqrt{1+ (f/f_b)^2}}$ en als fase:\\*
+$\phi = \arctan{(-f/f_b)}$ waarin\\*
+$f_b = \frac{1}{2\pi RC}$\\*
+Slide 13.9 gebruikt een spoel ipv een condensator. Het resutlaat is hetzelfde met $f_b = \frac{R}{2\pi L}$.\\*
+Op slide 13.11 zijn waarden uitgerekend voor de laagdoorlaatfilter met een spoel. Merk op dat er ook een faseverschuiving optreedt.
+\subsection{Eerste orde hoogdoorlaatfilter}
+Voor hoogdoorlaatfilters zijn de berekeningen conform. Nu staan de condensatoren en de spoelen in omgekeerde volgorde tov de weerstand (gooi dit niet door elkaar!).\\*
+Probeer zelf de berekeningen te maken. De bewerkingen staan op slide 13.14. We noteren hier het resulaat:\\*
+$H(f) = \frac{j(f/f_b)}{1+j(f/f_b)}$\\*
+met voor het C,R-filter\\*
+$f_b = \frac{1}{2\pi RC}$\\*
+en voor het R,L-filter\\*
+$f_b = \frac{R}{2\pi L}$\\*
+De waarde die op slide 13.14 is uitgerekend voor de waarde $f<<f_k$ is 20dB/decade. Als je $f=1/10f_k$ neemt, dan zal je $20log(|H(f)|)$ = -20dB uitkomen. Dit betekent -20dB/decade dat je naar links opschuift. Het is dus +20dB/decade dat je naar rechts opschuift. Op deze manier krijgen we het gespiegelde Bode-diagramma van het vorige onderdeel.
+\subsection{Banddoorlaatfilter}
+Voor de banddoorlaatfilters wordt er in de slides een andere configuratie gebruikt dan in de cursus. Toch zijn zij hetzelfde. De spoel en de condensator kunnen namelijk samengenomen worden zoals slide 13.15. Dat vereenvoudigt de zaken om de overdrachtsfunctie uit te rekenen (we hebben terug twee componenten). We noteren het resultaat:\\*
+$H(f) = \frac{1}{1+jQ_s(f/f_0-f_0/f)}$ met f$_0$ de resonantiefrequentie:\\*
+$f_0 = \frac{1}{2\pi\sqrt{LC}}$\\* en Q$_s$ de kwaliteitsfactor:\\*
+$Q_s = \frac{2\pi f_0L}{R}$
+\subsection{[Slides] (Tweede orde) Bandstopfilter}
+De naam tweede orde komt van het aantal inductieve elementen de filter bevat.\\*
+Een bandstopfilter is in feite het omgekeerde geval. Z$_1$ en Z$_2$ zijn hier omgewisseld. Het resultaat:\\*
+$H(f) = \frac{jQ_s(f/f_0-f_0/f)}{1+jQ_s(f/f_0-f_0/f)}$\\*
+f$_0$ en Q$_s$ blijven hetzelfde.\\*
+$\arctan{\phi} = Q_s(f_0/f-f_0/f)$
+\subsection{2de orde laagdoorlaatfilter en hoogdoorlaatfilter}
+Bij een 2de orde laagdoorlaatfilter is Z$_1$ = R+j$\omega$L en Z$_2$ = -j/$\omega$C. Resultaat:\\*
+$H(f) = \frac{-jQ_sf_0/f}{1+jQ_s(f/f_0-f_0/f)}$\\*
+Bij een 2de orde hoogdoorlaatfilter is Z$_1$ = R-j/$\omega$C en Z$_2$ = j$\omega$L. Resultaat:\\*
+$H(f) = \frac{-jQ_sf/f_0}{1+jQ_s(f/f_0-f_0/f)}$
+\section{Hoofdstuk 14 - Versterkers}
+\subsection{Inleiding}
+Dit stuk van de cursus is het slechtst uitgelegd van alle hoofdstukken. De prof/assistenten hadden niet beter hun best kunnen doen om de cursus/slides onbegrijpelijk te maken. We zullen toch een poging wagen om de cursus samen te vatten en de dingen aan te nemen die we niet kunnen afleiden. Als iemand betere notities heeft over dit hoofdstuk, mag hij/zij deze altijd doorsturen.\\*\\*
+Heel wat analoge signalen zijn zwak. Daarom is het nodig ze te versterken vooraleer ze verder te verwerken. De bedoeling is dat de versterker aan de uitgang een grotere amplitude teruggeeft dan het ingangssignaal:\\*
+$v_u(t) = A_vv_i(t)$ met A$_v$ de spanningsversterking\\*
+Het uitgangssignaal v$_u$(t) verschijnt over een belanstingsweerstand R$_L$. Zie figuur 14.1 op blz 14.1.\\*
+Er zijn meerdere modellen om versterkers voor te stellen. We beginnen met het spanning-versterkermodel.
+\subsection{Het spanning-versterkermodel}
+Dit model bevat de volgende componenten:\\*
+Een ingangsweerstand R$_i$, de open keten spanningsversterking A$_{v0}$ en de uitgangsweerstand R$_u$. De bron heeft een bronspanning v$_s$ en een inwendige weerstand R$_s$. De belasting wordt weergegeven door de belastingsweerstand R$_L$. Zie figuur 14.2 op blz 14.1.\\*
+Door omvorming van een eerdere formule: $A_v = \frac{v_u}{v_i}$\\*
+De stroomversterking $A_i = \frac{i_u}{i_i} = A_v\frac{R_i}{R_L}$\\*
+De vermogenversterking $G = \frac{P_u}{P_i} = A_vA_i$\\*
+We kunnen de spanningsversterking ook refereren tov de bronspanning:\\*
+$A_{vs} = \frac{v_u}{v_s}$ met als verband (Kirchoff + Ohm)\\*
+$v_i = \frac{R_i}{R_i+R_s}v_s$\\*
+We kunnen een gelijkaardige redenering toepassen op de uitgangsspanning:\\*
+$v_u = \frac{R_L}{R_u+R_L}A_{v0}v_i$\\*
+De globale (spanning/stroom/vermogen) versterking van een cascade van opeenvolgende versterkers is logischerwijs het product van de individuele versterkingen.\\*
+\subsection{Vermogen}
+Het inkomende vermogen is gelijk aan het uitgaande vermogen:\\*
+$P_i + P_s = P_u + P_d$\\*
+$P_i$ = vermogen door signaalbron, $P_s$ = vermogen door te eten (voeding dus), $P_u$ = vermogen door versterker in de belasting aan de uitgang, $P_d$ = vermogen gedissipeerd in versterker.\\*
+Rendement: $\eta = \frac{P_u}{P_s}$\\*
+Zie het voorbeeld op blz 14.3 hoe vermogens en het rendement te berekenen.
+\subsection{Transconductantie-versterkermodel}
+We defini\"eren de kortsluitings-transconductantieversterking:\\*
+$G_{mSC} = \frac{i_{uSC}}{v_i}$ met i$_{uSC}$ de uitgangsstroom bij kortsluiting.\\*
+{\scriptsize (Ezelsbruggetje: Dit is in feite de omgekeerde van de formule voor de weersand. Hoe kleiner de weerstand, hoe groter dit getal. Vandaar kortsluiting...versterking.)}\\*
+Verband door de uitgangsstoom bij kortsluiting aan de uitgang in het spanningsmodel te berekenen (zie figuur 14.4a op blz 14.4):\\*
+$i_{uSC} = \frac{A_{v0}v_i}{R_u}$\\*
+Dit geeft:\\*
+$G_{mSC} = \frac{A_{v0}}{Ru}$
+\subsection{Versterkerimpedanties}
+Indien we de open keten bronspanning van een sensor willen versterken, dan heeft de versterker een hoge ingangsimpedantie (R$_i$) nodig. Zie figuur 14.5 op blz 14.6. Indien we de kortsluit bronstroom van een sensor willen versterken, hebben we een zeer lage ingangsimpedantie nodig. Zie figuur 14.6 op blz 14.6.\\*
+Anderzijds, indien we een bepaalde spannginsgolfvorm wensen te realiseren over de klemmen van een variabele belasting, dan hebben we een zeer lage uitgangsimpedantie nodig. Wensen we een bepaalde stroomgolfvorm te realiseren, hebben we een zeer hoge uitgangsimpedantie nodig. Zie slide 14.8.\\*
+Op deze manier komen we tot tabel 14.1 op blz 14.7.
+\subsection{Frequentiegedrag}
+We veralgemenen de definitie van spanningsversterking otot een frequentieafhankelijke grootheid:\\*
+$A_v(f) = \frac{V_u(f)}{V_i(f)}$ waarbij V$_i$(f) en V$_u$(f) de Fouriergetransformeerde grootheden voorstellen van het ingangs-en uitgangssignaal.\\*
+Het verloop van A$_v$(f) naar frequentie nul toe wordt bepaald door de manier waarop de versterkers aan de ingang gekoppeld zijn en door de koppelingen tussen de versterkers. Bij een wisselstroomkoppeling worden koppelingscondensatoren toegepast die enkel wisselstroomsignalen doorlaten en versterken. Zie figuur 14.7 op blz 14.7.\\*
+Het verloop van A$_v$(f) bij hoge frequenties wordt bepaald door kleine capaciteiten in parallel en de kleine inductanties in serie die altijd aanwezig zijn op het signaalpad zowel in als tussen de versterkertrappen.\\*
+De bandbreedte wordt gemeten tussen de frequenties $f_L$ en $f_H$ waarvan de waarde voor $|A_v(f)|$ de niet nader gedefini\"eerde waarde $\frac{A_m}{\sqrt{2}}$ (?) aanneemt. Zie figuur 14.9 op blz 14.8.
+\subsection{Uitleg slides}
+Voor de uitleg van de slides 14.11-14.25 is een ander document beschikbaar. Het is niet echt nuttig dit over te typen.
+\section{Hoofdstuk 15 - Logische schakelingen}
+\subsection{Inleiding}
+Na de toch ietwat zwaardere hoofdstukken, zijn we nu aanbeland bij een belachelijk simpel hoofdstuk: logische schakelingen.
+\subsection{Binaire en decimale getallen}
+Voor de omzetting van binaire naar decemale getallen moet je gewoon elk cijfer (0 of 1) vermenigvuldigen met de juiste macht van 2:\\*
+$1110.01_2 = 1*2^3+1*2^2+1*2+1*2^{-2} = 14.25_{10}$\\*
+Voor de omzetting van decimalen aar binaire getallen moet je gewoon elk cijfer voor de komma delen door 2. We noteren hier de rest van de deling. De cijfers na de komma moet je vermenigvuldigen met 2 tot er geen rest overblijft. Noteer hier het hoofdresultaat:\\*
+$14.25_{10} = 14_{10} + 0.25_{10}$\\*
+$14/2 = 7$ $(rest = 0).$ $7/2 = 3$ $(rest = 1).$ $3/2 = 1$ $(rest = 1).$ $1/2 = 0 (rest = 1).$ $0.25*2 = 0$ $(rest = 0.5).$ $0.5*2 = 1$ $(rest = 0)$\\*
+Samen: $1110.01_2$\\*
+\subsection{Octale en hexadecimale getallen}
+Voor de overgang naar octale getallen vertrekken we van de binaire schijfwijze en vormen groepjes van 3:\\*
+$14.25_{10}$ = $1110.01_2$ = 001 110 . 010 = $16.2_8$\\*
+De overgang naar hexadecimale getallen is conform. Hier verdelen we de binaire schrijfwijze in groepjes van 4:\\*
+$14.25_{10}$ = $1110.01_2$ = 1110 . 0100 = $E.4_{16}$
+\subsection{BCD - Binary-Coded Decimal Format}
+Schrijf elk cijfer in de vorm van zijn 4-bit binair equivalent:\\*
+$14.25_{10}$ = 0001 0100 . 0010 0101 BCD.\\*
+Merk op dat de cijfers 1010 tot 1111 nooit zullen voorkomen.
+\subsection{Rekenkundig complement}
+Het 1-complement van een binair getal is alle 1en vervangen door 0en en omgekeerd. Het 2-complement van een binair getal is een 1 optellen bij het 1-complement en een eventuele overdracht van de meest beduidende bit (de eerste bit) weg te laten.\\*
+Het 2-complement wordt ook gebruikt om negatieve getallen voor te stellen. Als de eerste bit 0 is, dan is het een positief getal. Bij een 1 gaat het over een negatief getal:\\*
+$36_{10} - 20_{10} = 00100100_2 - 00010100_2 = 00100100_2 + 11101100_2$ (= 2-complement van 20) = $00010000 = 16_{10}$ (De meest beduidende bit valt hier weg)
+\subsection{Logische schakelingen}
+Combinatorische logische schakelingen hebben geen geheugen.\\*
+De AND-poort realiseert de logische vermenigvuldiging. De NOT-poort realiseert de inverse waarde. De OR-poort realiseert de logische optelling. Zie figuren 15.1-15.3 op blz 15.4.\\*
+Eigenschappen van de AND-bewerking:\\*
+AA = A, A1 = A, A0 = 0, AB = BA, A(BC) = (AB)C = ABC\\*
+Eigenschappen van de NOT-bewerking:\\*
+A$\overline{A}$ = 0, $\overline{\overline{A}}$\\*
+Eigenschappen van de NOT-bewerking:\\*
+(A+B)+C = A+(B+C) = A+B+C, A(B+C) = AB+AC, A+0 = A, A+1 = 1\\*
+{\scriptsize Zo kan $A\overline{B}C+ABC+(C+D)(\overline{D}+E)$ vereenvoudigd worden tot $C(A+\overline{D}+E)+DE$.}
+\subsection{Wetten van De Morgan}
+Als de logische variabelen in een logische uitdrukking ge\"inverteerd worden, dan wordt een AND vervangen door een OR, wordt een OR vervangen door een AND en wordt de volledige uitdrukking ge\"inverteerd:\\*
+ABC = $\overline{\overline{A}+\overline{B}+\overline{C}}$ en A+B+C = $\overline{\overline{A}\overline{B}\overline{C}}$\\*\\*
+De inversen van AND, OR zijn NAND, NOR. De laatste poorten voegen een NOT-poort toe achteraan de eerste poorten. Zie figuren 15.6 en 15.7 op blz 15.6 en 15.7.\\*
+Dan heb je nog de XOR-poort. Deze is de modulo-2-optelling. Die figuur 15.8 op blz 15.7.\\*
+De equivalentiepoort geeft een 1 wanneer beide ingangen gelijk zijn. Dit zou equivalent zijn met een NXOR-poort (mocht deze bestaan). Zie figuur 15.10 op blz 15.7.\\*
+Dan heb je ook nog een buffer. Deze wordt toegevoegd als er grote stroomsterktes nodig zijn. Zie figuur 15.9 op blz 15.7. Wat de functie is van deze "poort" in dit hoofdstuk is niet echt duidelijk.\\*
+Elke poort kan voorgesteld worden door een equivalente NAND en NOR configuratie. Zie blz 15.8 voor een overzicht.
+\subsection{Implementatiemethodes}
+Logische functies worden vaak omschreven in de gewone taal. De bedoeling is dat daar een waarheidstabel uit kan gehaald worden om een logische uitdrukking af te kunnen leiden. Uiteraard is het achteraf de bedoeling om het aantal poorten zo laag te maken. Dit kan gedaan worden door gebruik te maken van de bovenstaande rekenregels.
+\subsubsection{SOP - Sum Of Products}
+Zie de waarheidstabel figuur 15.13a op blz 15.9. Kolom D is de outputwaarde. We zien 4 outputwaarden die 1 zijn. Dit kunnen we schrijven als een som van producten (=mintermen):\\*
+D = $\overline{A}\overline{B}\overline{C}+\overline{A}B\overline{C}+AB\overline{C}+ABC$ waaruit automatisch de implementatie figuur 15.13b volgt.
+\subsubsection{POS - Product Of Sums}
+We gebruiken opnieuw dezelde waarheidstabel. We zien 4 outputwarden die 0 zijn. Het product is nul. Dat wil zeggen dat (volgens De Morgan) de som van de omgekeerdes 1 moet zijn. We krijgen een product van sommen (=maxtermen):\\*
+D = $(A+B+\overline{C})(A+\overline{B}+\overline{C})(\overline{A}+B+C)(\overline{A}+B+\overline{C})$ waarout automatisch de implementatie figuur 15.14 volgt.
+\subsection{Decoders}
+Een decoder vertaalt data van de ene code in de andere. Zie het voorbeeld op blz 15.11.
+\subsection{Karnaugh-kaarten}
+In plaats van gebruik te maken van rekenregels kunnen we de uitgekomen formules bij de implementatiemethodes vereenvoudigen door gebruik te maken van Karnaugh-kaarten. De bedoeling is een veld op te stellen zoals in figuur 15.17 op blz 15.13. Zet 1tjes op de juiste plaatsen. Vorm op deze ingevulde kaart zo groot mogelijke vakjes van 2, 4, 8, $\dots$ aantal 1tjes. Zie figuur 15.18 op blz 15.14. Elk 2-/4-/8-/$\dots$-veld komt dan overeen met een logische combinatie. De combinaties optellen bekomt de uitkomst.
+\end{document}
